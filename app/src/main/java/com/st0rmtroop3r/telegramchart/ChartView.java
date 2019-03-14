@@ -18,15 +18,12 @@ public class ChartView extends View {
 
     private final static String TAG = ChartView.class.getSimpleName();
 
-    private final ArrayList<Chart> charts = new ArrayList<>();
+    protected final ArrayList<Chart> charts = new ArrayList<>();
     private int yAxisMaxValue = 0;
     protected int xAxisLength = 0;
     protected float xAxisInterval = 0;
     protected int viewWidth = 0;
     protected int viewHeight = 0;
-
-    private float displayDataPercentStart = 0f;
-    private float displayDataPercentEnd = 1f;
 
     public ChartView(Context context) {
         super(context);
@@ -42,7 +39,6 @@ public class ChartView extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
         for (Chart chart : charts) {
             canvas.drawPath(chart.path, chart.paint);
         }
@@ -68,11 +64,6 @@ public class ChartView extends View {
             }
             xAxisLength = data.length;
 
-            if (data.length < 3) {
-                xAxisInterval = data.length;
-            } else {
-                xAxisInterval = (float) getDrawableAreaWidth() / (data.length - 2);
-            }
         }
         if (viewWidth > 0 && viewHeight > 0) {
             Log.w(TAG, "setChartsData: viewWidth: " + viewWidth + ", viewHeight: " + viewHeight );
@@ -80,30 +71,21 @@ public class ChartView extends View {
         }
     }
 
-    void setChartsDataDisplayRange(float fromPercent, float toPercent) {
-        displayDataPercentStart = fromPercent;
-        displayDataPercentEnd = toPercent;
-    }
-
     protected void setupChartsPath() {
-        for (Chart chart : charts) {
-            int fromIndex = Math.round(displayDataPercentStart * (chart.data.length - 1));
-            int toIndex = Math.round(displayDataPercentEnd * (chart.data.length - 1));
 
-            chart.setupPath(fromIndex, toIndex);
+        if (xAxisLength < 3) {
+            xAxisInterval = xAxisLength;
+        } else {
+            xAxisInterval = (float) viewWidth / (xAxisLength - 2);
+            Log.w(TAG, "setChartsData: " + viewWidth + " / " + (xAxisLength - 2) + " = " + xAxisInterval);
+        }
+        for (Chart chart : charts) {
+            chart.setupPath();
         }
         invalidate();
     }
 
-    private int getDrawableAreaWidth() {
-        return viewWidth - getPaddingLeft() - getPaddingRight();
-    }
-
-    private int getDrawableAreaHeight() {
-        return viewHeight - getPaddingTop() - getPaddingBottom();
-    }
-
-    private class Chart {
+    class Chart {
         Path path = new Path();
         Paint paint = new Paint();
         int[] data;
@@ -126,28 +108,26 @@ public class ChartView extends View {
             paint.setStrokeWidth(10f);
         }
 
-        void setupPath(int fromDataIndex, int toDataIndex) {
-            int dataRange = toDataIndex - fromDataIndex;
+        void setupPath() {
+//            Log.w(TAG, "setupPath: fromDataIndex: " + fromDataIndex + ", toDataIndex: " + toDataIndex + ", range = " + dataRange);
 
-            Log.w(TAG, "setupPath: fromDataIndex: " + fromDataIndex + ", toDataIndex: " + toDataIndex + ", range = " + dataRange);
-
-            if (dataRange < 3) {
-                widthInterval = dataRange;
+            if (data.length < 3) {
+                widthInterval = data.length;
             } else {
-                widthInterval = (float) getDrawableAreaWidth() / (dataRange - 2);
+                widthInterval = (float) viewWidth / data.length;
             }
 
 
             if (yAxisMaxValue == 0) {
                 heightInterval = 0;
             } else {
-                heightInterval = (float) getDrawableAreaHeight() / yAxisMaxValue;
+                heightInterval = (float) viewHeight / yAxisMaxValue;
             }
 
             path.reset();
-            path.moveTo(0, viewHeight - heightInterval * data[fromDataIndex]);
-            for (int i = 0; i <= toDataIndex - fromDataIndex; i++) {
-                path.lineTo(widthInterval * i, viewHeight - heightInterval * data[i + fromDataIndex]);
+            path.moveTo(widthInterval, viewHeight - heightInterval * data[0]);
+            for (int i = 1; i < data.length; i++) {
+                path.lineTo(widthInterval * i, viewHeight - heightInterval * data[i]);
             }
 
         }

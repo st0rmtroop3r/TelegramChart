@@ -80,6 +80,7 @@ public class FlexileWindowSelector extends View {
     }
 
     private void notifyListener(float left, float right) {
+//        Log.w(TAG, "notifyListener: left " + left + ", right " + right);
         if (listener != null) {
             float leftPercent = left / getWidth();
             float rightPercent = right / getWidth();
@@ -110,12 +111,14 @@ public class FlexileWindowSelector extends View {
 
         private int defaultWindowWidth = 400;
         private int minWindowWidth = 300;
-        private float framePaintStrokeWidth = 30f;
+        private int frameSideWidth = 30;
+        private int frameSideHalfWidth = frameSideWidth / 2;
         private WindowSection section = WindowSection.NONE;
+        private int touchOffset;
 
         WindowFrame(Context context) {
             framePaint.setStyle(Paint.Style.STROKE);
-            framePaint.setStrokeWidth(framePaintStrokeWidth);
+            framePaint.setStrokeWidth(frameSideWidth);
             framePaint.setColor(context.getResources().getColor(R.color.flexile_window_border));
 
             sideDimPaint.setStyle(Paint.Style.FILL);
@@ -134,6 +137,7 @@ public class FlexileWindowSelector extends View {
                 section = WindowSection.RIGHT_BORDER;
             } else if (contains(x)) {
                 section = WindowSection.WINDOW;
+                touchOffset = offset(x);
             } else {
                 section = WindowSection.NONE;
             }
@@ -159,7 +163,7 @@ public class FlexileWindowSelector extends View {
         void move(int x) {
             switch (section) {
                 case WINDOW:
-                    moveWindow(x);
+                    moveWindow(x - touchOffset);
                     break;
                 case LEFT_BORDER:
                     moveLeftBorder(x);
@@ -170,43 +174,65 @@ public class FlexileWindowSelector extends View {
             }
         }
 
+        int offset(int x) {
+            return x - windowLeft() - windowWidth() / 2;
+        }
+
         void moveWindow(int x) {
-//            Log.w(TAG, "move: " + x);
-            int halfWidth = frameRect.width() / 2;
+//            Log.w(TAG, "moveWindow: to " + x);
+            int halfWidth = windowWidth() / 2;
+            int left, right;
 
-            if (x - halfWidth > 0 && x + halfWidth < getWidth()) {
-                frameRect.left = x - halfWidth;
-                frameRect.right = x + halfWidth;
+            if (x - halfWidth < 0) {
+                left = 0;
+                right = windowWidth();
+            } else if (x + halfWidth > getWidth()) {
+                left = getWidth() - windowWidth();
+                right = getWidth();
+            } else {
+                left = x - halfWidth;
+                right = x + halfWidth;
+            }
 
-                leftDimRect.right = frameRect.left;
-                rightDimRect.left = frameRect.right;
+            boolean changed = false;
 
+            if (left != windowLeft()) {
+                windowLeft(left);
+                leftDimRect.right = left;
+                changed = true;
+            }
+            if (right != windowRight()) {
+                windowRight(right);
+                rightDimRect.left = right;
+                changed = true;
+            }
+            if (changed) {
                 invalidate();
-                notifyListener(frameRect.left, frameRect.right);
+                notifyListener(windowLeft(), windowRight());
             }
         }
 
         void moveLeftBorder(int x) {
 //            Log.w(TAG, "moveLeftBorder: " + x);
-            if (frameRect.right - x >= minWindowWidth) {
-                frameRect.left = x;
+            if (windowRight() - x >= minWindowWidth) {
+                windowLeft(x);
 
-                leftDimRect.right = frameRect.left;
+                leftDimRect.right = windowLeft();
 
                 invalidate();
-                notifyListener(frameRect.left, frameRect.right);
+                notifyListener(windowLeft(), windowRight());
             }
         }
 
         void moveRightBorder(int x) {
 //            Log.w(TAG, "moveRightBorder: " + x);
-            if (x - frameRect.left >= minWindowWidth) {
-                frameRect.right = x;
+            if (x - windowLeft() >= minWindowWidth) {
+                windowRight(x);
 
-                rightDimRect.left = frameRect.right;
+                rightDimRect.left = windowRight();
 
                 invalidate();
-                notifyListener(frameRect.left, frameRect.right);
+                notifyListener(windowLeft(), windowRight());
             }
         }
 
@@ -214,7 +240,7 @@ public class FlexileWindowSelector extends View {
 
             frameRect.bottom = height + 5;
             frameRect.left = width - defaultWindowWidth;
-            frameRect.right = (int) (width - framePaintStrokeWidth / 2);
+            frameRect.right = width - frameSideHalfWidth;
 
             leftDimRect.right = frameRect.left;
             leftDimRect.bottom = height;
@@ -222,6 +248,26 @@ public class FlexileWindowSelector extends View {
             rightDimRect.bottom = height;
             rightDimRect.right = width;
             rightDimRect.left = frameRect.right;
+        }
+
+        int windowWidth() {
+            return frameRect.width() + frameSideWidth;
+        }
+
+        int windowLeft() {
+            return frameRect.left - frameSideHalfWidth;
+        }
+
+        void windowLeft(int x) {
+            frameRect.left = x + frameSideHalfWidth;
+        }
+
+        int windowRight() {
+            return frameRect.right + frameSideHalfWidth;
+        }
+
+        void windowRight(int x) {
+            frameRect.right = x - frameSideHalfWidth;
         }
     }
 

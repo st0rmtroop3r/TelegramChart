@@ -16,9 +16,18 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
+    boolean clickFlag;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        mainActivity();
+//        testActivity();
+
+    }
+
+    private void mainActivity() {
         setContentView(R.layout.activity_main);
 
         final ReactiveChartView reactiveChartView = findViewById(R.id.reactive);
@@ -35,9 +44,32 @@ public class MainActivity extends AppCompatActivity {
         chartWindowSelector.setChartsData(list);
         reactiveChartView.setChartsData(list);
         chartWindowSelector.setSelectionListener((left, right) -> {
-            Log.w(TAG, "listener: left: $left, right: $right");
-            reactiveChartView.setRange(left, right);
+//            Log.w(TAG, "listener: left: $left, right: $right");
+//            reactiveChartView.setRange(left, right);
+            reactiveChartView.setZoomRange(left, right);
+        });
+    }
 
+    private void testActivity() {
+        setContentView(R.layout.activity_test);
+
+        SampleView s1 = findViewById(R.id.scale1);
+        SampleView s2 = findViewById(R.id.scale2);
+        SampleView s3 = findViewById(R.id.scale3);
+
+//        s1.setScale(3f, 1f);
+        s1.setRange(0.25f, 0.5f);
+//        s2.setScale(2f, 1f);
+//        s3.setScale(0.5f, 0.5f);
+
+        s1.setOnClickListener(v -> {
+            Log.w(TAG, "onCreate: click");
+            if (clickFlag) {
+                s1.setRange(0.25f, 0.5f);
+            } else {
+                s1.setRange(0.1f, 0.9f);
+            }
+            clickFlag = !clickFlag;
         });
     }
 }
