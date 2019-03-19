@@ -45,11 +45,12 @@ public class MainActivity extends AppCompatActivity {
 
         chartWindowSelector.setChartsData(list);
 //        reactiveChartView.setChartsData(list);
-//        chartWindowSelector.setSelectionListener((left, right) -> {
-////            Log.w(TAG, "listener: left: $left, right: $right");
-////            reactiveChartView.setRange(left, right);
+        chartWindowSelector.setSelectionListener((left, right) -> {
+//            Log.w(TAG, "listener: left: $left, right: $right");
+//            reactiveChartView.setRange(left, right);
 //            reactiveChartView.setZoomRange(left, right);
-//        });
+            coordinatesView.setXAxisDataRange(left, right);
+        });
 
         coordinatesView.setOnClickListener(v -> coordinatesView.setYAxisMaxValue((int) (Math.random() * 100 + 100)));
 
@@ -61,6 +62,11 @@ public class MainActivity extends AppCompatActivity {
 //            }
 //            clickFlag = !clickFlag;
 //        });
+
+        coordinatesView.setXAxisData(DataProvider.x);
+        coordinatesView.setXAxisDataRange(.34f, .78f);
+
+        Log.i(TAG, "mainActivity: xMax.length = " + DataProvider.xMax.length);
     }
 
     private void testActivity() {
