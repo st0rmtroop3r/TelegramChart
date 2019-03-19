@@ -31,10 +31,10 @@ public class MainActivity extends AppCompatActivity {
     private void mainActivity() {
         setContentView(R.layout.activity_main);
 
-//        final ReactiveChartView reactiveChartView = findViewById(R.id.reactive);
+        final ChartView reactiveChartView = findViewById(R.id.reactive);
         ChartWindowSelector chartWindowSelector = findViewById(R.id.selector);
         LinearLayout checkBoxes = findViewById(R.id.ll_checkBoxes);
-        CoordinatesView coordinatesView = findViewById(R.id.reactive);
+        CoordinatesView coordinatesView = findViewById(R.id.coordinates);
 
         Pair<int[], String> y0pair = DataProvider.getY0Data();
         Pair<int[], String> y1pair = DataProvider.getY1Data();
@@ -44,11 +44,9 @@ public class MainActivity extends AppCompatActivity {
         list.add(new Pair<>(y1pair.first, Color.parseColor(y1pair.second)));
 
         chartWindowSelector.setChartsData(list);
-//        reactiveChartView.setChartsData(list);
+        reactiveChartView.setChartsData(list);
         chartWindowSelector.setSelectionListener((left, right) -> {
-//            Log.w(TAG, "listener: left: $left, right: $right");
-//            reactiveChartView.setRange(left, right);
-//            reactiveChartView.setZoomRange(left, right);
+            reactiveChartView.setZoomRange(left, right);
             coordinatesView.setXAxisDataRange(left, right);
         });
 

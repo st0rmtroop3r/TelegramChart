@@ -1,27 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
     <com.st0rmtroop3r.telegramchart.CoordinatesView
+        android:id="@+id/coordinates"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/coordinates_height"
+        android:layout_alignParentTop="true"
+        android:background="#F7F7F7" />
+
+    <com.st0rmtroop3r.telegramchart.ChartView
         android:id="@+id/reactive"
         android:layout_width="match_parent"
-        android:layout_height="400dp"
-
-        android:background="#F7F7F7" />
+        android:layout_height="@dimen/chart_height"
+        android:layout_alignParentTop="true"
+        />
 
     <com.st0rmtroop3r.telegramchart.ChartWindowSelector
         android:id="@+id/selector"
         android:layout_width="match_parent"
-        android:layout_height="50dp" />
+        android:layout_height="50dp"
+        android:layout_below="@id/coordinates"
+        />
 
     <LinearLayout
         android:id="@+id/ll_checkBoxes"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal" />
+        android:orientation="horizontal"
+        android:layout_below="@id/selector"
+        />
 
 
-</LinearLayout>
+</RelativeLayout>

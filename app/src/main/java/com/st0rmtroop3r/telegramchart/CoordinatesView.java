@@ -66,17 +66,17 @@ public class CoordinatesView extends View {
 
     public CoordinatesView(Context context) {
         super(context);
-        init();
+        init(context);
     }
 
     public CoordinatesView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        init();
+        init(context);
     }
 
     public CoordinatesView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init();
+        init(context);
     }
 
     @Override
@@ -113,7 +113,7 @@ public class CoordinatesView extends View {
 //                + scale + ", debugCircleY " + debugCircleY + ", mark.y " + yAxisAnimators.get(0).yMarks[4].y);
     }
 
-    private void init() {
+    private void init(Context context) {
 
         textPaint.setColor(textColor);
         textPaint.setTextSize(60);
@@ -124,6 +124,8 @@ public class CoordinatesView extends View {
         xAxisLinePaint.setStrokeWidth(3f);
 
         yStartMark.text = "0";
+
+        paddingY = context.getResources().getDimensionPixelSize(R.dimen.coordinates_x_padding);
 
         xAxis = new XAxis();
 
@@ -146,7 +148,7 @@ public class CoordinatesView extends View {
     }
 
     void setYAxisMaxValue(int newValue) {
-        Log.w(TAG, "setYAxisMaxValue: " + newValue + ", yAxisAnimators.size " + yAxisAnimators.size());
+//        Log.w(TAG, "setYAxisMaxValue: " + newValue + ", yAxisAnimators.size " + yAxisAnimators.size());
 
         if (newValue == yAxisMaxValue) return;
 
