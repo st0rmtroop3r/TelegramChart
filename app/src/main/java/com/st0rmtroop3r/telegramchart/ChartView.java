@@ -19,7 +19,7 @@ public class ChartView extends View {
     private final static String TAG = ChartView.class.getSimpleName();
 
     protected final ArrayList<Chart> charts = new ArrayList<>();
-    private int yAxisMaxValue = 0;
+    protected int yAxisMaxValue = 0;
     protected int xAxisLength = 0;
     protected float xInterval = 0;
     protected int viewWidth = 0;
@@ -28,9 +28,10 @@ public class ChartView extends View {
     protected float xTo = 1;
     protected float totalScaledWidth;
     protected float xOffset;
-    protected int leftPadding = 50;
-    protected int rightPadding = 50;
+    protected int leftPadding = 0;
+    protected int rightPadding = 0;
     protected int totalXPadding = leftPadding + rightPadding;
+    protected float chartStrokeWidth = 10;
 
     public ChartView(Context context) {
         super(context);
@@ -57,6 +58,10 @@ public class ChartView extends View {
         Log.w(TAG, "onSizeChanged: w: " + w + ", h: " + h);
         viewWidth = w;
         viewHeight = h;
+        leftPadding = getPaddingLeft();
+        rightPadding = getPaddingRight();
+        totalXPadding = leftPadding + rightPadding;
+        Log.w(TAG, "onSizeChanged: rightPadding = " + rightPadding + ", leftPadding = " + leftPadding);
         updateView();
     }
 
@@ -141,7 +146,7 @@ public class ChartView extends View {
             paint.setStyle(Paint.Style.STROKE);
             paint.setStrokeJoin(Paint.Join.ROUND);
             paint.setStrokeCap(Paint.Cap.ROUND);
-            paint.setStrokeWidth(10f);
+            paint.setStrokeWidth(chartStrokeWidth);
 
         }
     }

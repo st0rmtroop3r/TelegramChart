@@ -4,7 +4,7 @@
     <color name="colorPrimaryDark">#426382</color>
     <color name="colorAccent">#D81B60</color>
 
-    <color name="flexile_window_border">#4D000000</color>
-    <color name="flexile_window_dim">#19000000</color>
+    <color name="flexile_window_border">#80C9DBE9</color>
+    <color name="flexile_window_dim">#80F1F5Fd</color>
 
 </resources>

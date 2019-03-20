@@ -11,7 +11,6 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 
 import java.text.SimpleDateFormat;
@@ -238,7 +237,6 @@ public class CoordinatesView extends View {
 
             float numberOfMarksChartCanFit = (totalChartWidth - markWidth) / markWidth;
 
-            Log.w(TAG, "applyXDataRange: skip " + skip );
             for (int i = 0; i < xMarks.length; i++) {
                 xMarks[i].y = baseLine + 80;
                 xMarks[i].x = (int) ((totalChartWidth - xPadding - markWidth * 0.1) / xMarks.length * i - totalChartWidth * xAxisDataRangeFrom) + xPadding;
