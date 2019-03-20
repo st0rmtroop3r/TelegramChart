@@ -12,7 +12,7 @@
         android:layout_alignParentTop="true"
         android:background="#F7F7F7" />
 
-    <com.st0rmtroop3r.telegramchart.ChartView
+    <com.st0rmtroop3r.telegramchart.ReactiveChartView
         android:id="@+id/reactive"
         android:layout_width="match_parent"
         android:layout_height="@dimen/chart_height"

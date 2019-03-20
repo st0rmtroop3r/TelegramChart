@@ -24,8 +24,13 @@ public class ChartView extends View {
     protected float xInterval = 0;
     protected int viewWidth = 0;
     protected int viewHeight = 0;
-    private float xFrom = 0;
-    private float xTo = 1;
+    protected float xFrom = 0;
+    protected float xTo = 1;
+    protected float totalScaledWidth;
+    protected float xOffset;
+    protected int leftPadding = 50;
+    protected int rightPadding = 50;
+    protected int totalXPadding = leftPadding + rightPadding;
 
     public ChartView(Context context) {
         super(context);
@@ -81,15 +86,15 @@ public class ChartView extends View {
     protected void updateView() {
 
         float range = xTo - xFrom;
-        float totalScaledWidth = viewWidth / range;
-        xInterval = (totalScaledWidth - 100) / xAxisLength;
+        totalScaledWidth = viewWidth / range;
+        xInterval = (totalScaledWidth - totalXPadding) / xAxisLength;
 
-        float xOffset = -totalScaledWidth * xFrom;
+        xOffset = -totalScaledWidth * xFrom;
 
         int fromDataIndex = (int) (xAxisLength * xFrom);
         fromDataIndex = fromDataIndex > 0 ? fromDataIndex - 1 : 0;
 
-        float dataFromX = fromDataIndex * xInterval + xOffset + 50;
+        float dataFromX = fromDataIndex * xInterval + xOffset + leftPadding;
 
         setupChartsPath(dataFromX, fromDataIndex);
 
@@ -102,7 +107,6 @@ public class ChartView extends View {
             chart.heightInterval = (float) viewHeight / yAxisMaxValue;
             chart.path.reset();
             chart.path.moveTo(dataFromX, viewHeight - chart.heightInterval * chart.data[fromDataIndex]);
-            Log.w(TAG, "ololo: heightInterval " + chart.heightInterval);
         }
 
         for (int i = 1; dataFromX + xInterval * i < viewWidth + xInterval; i++) {

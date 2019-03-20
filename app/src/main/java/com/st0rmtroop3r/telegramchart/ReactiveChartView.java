@@ -6,7 +6,11 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.AttributeSet;
-import android.util.Log;
+import android.util.Pair;
+import android.view.MotionEvent;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import androidx.annotation.Nullable;
 
@@ -14,14 +18,12 @@ public class ReactiveChartView extends ChartView {
 
     private static final String TAG = ReactiveChartView.class.getSimpleName();
 
-    private float xFrom = 0;
-    private float xTo = 1;
-
-    private Path linePath = new Path();
-    private Paint linePaint = new Paint();
-
-    private Path aPath = new Path();
-    private Paint aPaint = new Paint();
+    private final Path linePath = new Path();
+    private final Paint linePaint = new Paint();
+    private final Paint innerCirclePaint = new Paint();
+    private final List<Circle> circles = new ArrayList<>();
+    private final float circleOuterRadius = 25f;
+    private final float circleInnerRadius = 15f;
 
     public ReactiveChartView(Context context) {
         super(context);
@@ -43,67 +45,123 @@ public class ReactiveChartView extends ChartView {
         linePaint.setStyle(Paint.Style.STROKE);
         linePaint.setStrokeJoin(Paint.Join.ROUND);
         linePaint.setStrokeCap(Paint.Cap.ROUND);
-        linePaint.setStrokeWidth(10f);
-    }
+        linePaint.setStrokeWidth(5f);
 
-    void setZoomRange(float fromPercent, float toPercent) {
-        xFrom = fromPercent;
-        xTo = toPercent;
-        updateView2();
+        innerCirclePaint.setColor(Color.WHITE);
+        innerCirclePaint.setStyle(Paint.Style.FILL);
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
 
         canvas.drawPath(linePath, linePaint);
 
-        canvas.drawPath(aPath, aPaint);
-    }
-
-
-    private int getNearestXPoint(float x) {
-        float xAxisPercent = x / viewWidth;
-        Log.w(TAG, "getNearestXPoint: " + x + " / " + viewWidth + " = " + xAxisPercent);
-        float xPoint = (xAxisLength) * xAxisPercent;
-        Log.w(TAG, "getNearestXPoint: " + (xAxisLength) + " * " + xAxisPercent + " = " + xPoint);
-        return Math.round(xPoint);
-    }
-
-    private void ololo() {
-        int[] aData = charts.get(0).data;
-        float range = xTo - xFrom;
-        float totalScaledWidth = viewWidth / range;
-        float xInterval = (totalScaledWidth - 100) / (aData.length - 1);
-        float xOffset = -totalScaledWidth * xFrom;
-        Log.w(TAG, "ololo: xInterval " + xInterval + ", xOffset " + xOffset );
-
-        int fromDataIndex = (int) ((aData.length - 1) * xFrom);
-        fromDataIndex = fromDataIndex > 0 ? fromDataIndex - 1 : 0;
-        int toDataIndex = (int) ((aData.length - 1) * xTo);
-        toDataIndex = toDataIndex < aData.length - 1 ? toDataIndex + 1 : aData.length - 1;
-        float dataFromX = fromDataIndex * xInterval + xOffset + 50;
-//        Log.w(TAG, "ololo: fromDataIndex " + fromDataIndex + ", toDataIndex " + toDataIndex + ", dataFromX " + dataFromX);
-
-        Path path = aPath;
-        path.reset();
-        path.moveTo(dataFromX, viewHeight - charts.get(0).heightInterval * aData[(int) fromDataIndex]);
-        for (int i = 1; dataFromX + xInterval * i < viewWidth + xInterval; i++) {
-            try {
-                path.lineTo(dataFromX + xInterval * i, viewHeight - charts.get(0).heightInterval * aData[fromDataIndex + i]);
-            } catch (ArrayIndexOutOfBoundsException e) {
-//                Log.e(TAG, "ololo: i " + i + ", " + ", fromDataIndex + i = " + (fromDataIndex + i));
-                break;
-            }
+        for (Circle circle : circles) {
+            circle.draw(canvas);
         }
-        aPath = path;
-        aPaint = charts.get(0).paint;
     }
 
-    private void updateView2() {
-        ololo();
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                onActionDown(event.getX());
+                return true;
+            case MotionEvent.ACTION_MOVE:
+                onActionMove(event.getX());
+                return true;
+            case MotionEvent.ACTION_UP:
+                onActionUp();
+                return true;
+            default:
+                return super.onTouchEvent(event);
+        }
+    }
+
+    @Override
+    void setChartsData(List<Pair<int[], Integer>> chartsData) {
+        super.setChartsData(chartsData);
+        circles.clear();
+        for (Pair pair : chartsData) {
+            circles.add(new Circle((Integer) pair.second));
+        }
+    }
+
+    private void onActionDown(float x) {
+        if (isHighlightAvailable(x)) invalidate();
+    }
+
+    private void onActionMove(float x) {
+        resetHighlightPaths();
+        if (isHighlightAvailable(x)) invalidate();
+    }
+
+    private void onActionUp() {
+        resetHighlightPaths();
         invalidate();
     }
 
+    private boolean isHighlightAvailable(float x) {
+        int nearestXDataIndex = getNearestXDataIndex(x);
+        if (nearestXDataIndex < 0 || nearestXDataIndex > xAxisLength) return false;
+        setupHighlightPaths(nearestXDataIndex);
+        return true;
+    }
 
+    private void setupHighlightPaths(int dataIndex) {
+        float xCoordinate = getDataIndexXCoordinate(dataIndex);
+        linePath.moveTo(xCoordinate, 0f);
+        linePath.lineTo(xCoordinate, viewHeight);
+
+        for (int i = 0; i < charts.size(); i++) {
+            Chart chart = charts.get(i);
+            circles.get(i).setCoordinates(xCoordinate, viewHeight - chart.heightInterval * chart.data[dataIndex]);
+        }
+    }
+
+    private void resetHighlightPaths() {
+        linePath.reset();
+        for (Circle circle : circles) {
+            circle.reset();
+        }
+    }
+
+    private int getNearestXDataIndex(float x) {
+        float scaledXPosition = x - xOffset;
+        float scaledWidthPercent = (scaledXPosition - leftPadding) / (totalScaledWidth - totalXPadding);
+        return Math.round(xAxisLength * scaledWidthPercent);
+    }
+
+    private float getDataIndexXCoordinate(int dataIndex) {
+        return leftPadding + xInterval * dataIndex + xOffset;
+    }
+
+    private class Circle {
+        Path outer = new Path();
+        Path inner = new Path();
+        Paint paint = new Paint();
+
+        Circle(int color) {
+            paint.setColor(color);
+            paint.setStyle(Paint.Style.FILL);
+            paint.setStrokeWidth(5f);
+        }
+
+        void setCoordinates(float x, float y) {
+            outer.addCircle(x, y, circleOuterRadius, Path.Direction.CW);
+            inner.addCircle(x, y, circleInnerRadius, Path.Direction.CW);
+        }
+
+        void draw(Canvas canvas) {
+            canvas.drawPath(outer, paint);
+            canvas.drawPath(inner, innerCirclePaint);
+        }
+
+        void reset() {
+            outer.reset();
+            inner.reset();
+        }
+    }
 }
 
