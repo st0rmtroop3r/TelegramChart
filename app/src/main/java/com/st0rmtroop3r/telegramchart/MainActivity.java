@@ -31,10 +31,12 @@ public class MainActivity extends AppCompatActivity {
     private void mainActivity() {
         setContentView(R.layout.activity_main);
 
-        final ChartView reactiveChartView = findViewById(R.id.reactive);
+        final ReactiveChartView reactiveChartView = findViewById(R.id.reactive);
         ChartWindowSelector chartWindowSelector = findViewById(R.id.selector);
         LinearLayout checkBoxes = findViewById(R.id.ll_checkBoxes);
         CoordinatesView coordinatesView = findViewById(R.id.coordinates);
+
+        reactiveChartView.badge = findViewById(R.id.grid);
 
         Pair<int[], String> y0pair = DataProvider.getY0Data();
         Pair<int[], String> y1pair = DataProvider.getY1Data();

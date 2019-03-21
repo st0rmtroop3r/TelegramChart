@@ -5,5 +5,6 @@
     <dimen name="coordinates_height">400dp</dimen>
     <dimen name="coordinates_x_padding">40dp</dimen>
     <dimen name="margin_horizontal">16dp</dimen>
+    <dimen name="highlight_line">1dp</dimen>
 
 </resources>

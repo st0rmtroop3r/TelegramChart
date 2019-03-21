@@ -2,16 +2,13 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
     <com.st0rmtroop3r.telegramchart.CoordinatesView
         android:id="@+id/coordinates"
         android:layout_width="match_parent"
         android:layout_height="@dimen/coordinates_height"
-        android:layout_alignParentTop="true"
-        />
+        android:layout_alignParentTop="true" />
 
     <com.st0rmtroop3r.telegramchart.ReactiveChartView
         android:id="@+id/reactive"
@@ -21,8 +18,7 @@
         android:paddingLeft="@dimen/margin_horizontal"
         android:paddingStart="@dimen/margin_horizontal"
         android:paddingRight="@dimen/margin_horizontal"
-        android:paddingEnd="@dimen/margin_horizontal"
-        />
+        android:paddingEnd="@dimen/margin_horizontal" />
 
     <com.st0rmtroop3r.telegramchart.ChartWindowSelector
         android:id="@+id/selector"
@@ -32,21 +28,19 @@
         android:layout_marginLeft="@dimen/margin_horizontal"
         android:layout_marginStart="@dimen/margin_horizontal"
         android:layout_marginRight="@dimen/margin_horizontal"
-        android:layout_marginEnd="@dimen/margin_horizontal"
-
-        />
+        android:layout_marginEnd="@dimen/margin_horizontal" />
 
     <LinearLayout
         android:id="@+id/ll_checkBoxes"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_below="@id/selector"
-        />
+        android:layout_below="@id/selector" />
 
     <com.st0rmtroop3r.telegramchart.Badge
         android:id="@+id/grid"
         android:visibility="gone"
+        android:elevation="2dp"
         android:layout_margin="16dp"
         android:paddingTop="8dp"
         android:paddingBottom="8dp"
@@ -55,6 +49,5 @@
         android:background="@drawable/round_corners"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
-
 
 </RelativeLayout>
