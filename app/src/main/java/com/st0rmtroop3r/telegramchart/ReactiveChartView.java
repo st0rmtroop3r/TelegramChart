@@ -13,8 +13,6 @@ import android.view.MotionEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-import androidx.annotation.Nullable;
-
 public class ReactiveChartView extends ChartView {
 
     private static final String TAG = ReactiveChartView.class.getSimpleName();
@@ -34,12 +32,12 @@ public class ReactiveChartView extends ChartView {
         init(context);
     }
 
-    public ReactiveChartView(Context context, @Nullable AttributeSet attrs) {
+    public ReactiveChartView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init(context);
     }
 
-    public ReactiveChartView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public ReactiveChartView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init(context);
     }

@@ -1,18 +1,19 @@
 package com.st0rmtroop3r.telegramchart;
 
+import android.app.Activity;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.Pair;
 import android.widget.LinearLayout;
 
+import com.st0rmtroop3r.telegramchart.enitity.Chart;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import androidx.appcompat.app.AppCompatActivity;
 
-
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends Activity {
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
@@ -30,6 +31,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void mainActivity() {
         setContentView(R.layout.activity_main);
+
+        List<Chart> charts = DataProvider.readChartsData(getApplicationContext(), R.raw.chart_data);
 
         final ReactiveChartView reactiveChartView = findViewById(R.id.reactive);
         ChartWindowSelector chartWindowSelector = findViewById(R.id.selector);

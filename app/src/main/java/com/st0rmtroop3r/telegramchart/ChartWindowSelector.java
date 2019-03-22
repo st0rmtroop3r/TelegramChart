@@ -10,8 +10,6 @@ import android.view.MotionEvent;
 
 import java.util.List;
 
-import androidx.annotation.Nullable;
-
 public class ChartWindowSelector extends ChartView {
 
     private static final String TAG = ChartWindowSelector.class.getSimpleName();
@@ -30,12 +28,12 @@ public class ChartWindowSelector extends ChartView {
         init(context);
     }
 
-    public ChartWindowSelector(Context context, @Nullable AttributeSet attrs) {
+    public ChartWindowSelector(Context context, AttributeSet attrs) {
         super(context, attrs);
         init(context);
     }
 
-    public ChartWindowSelector(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public ChartWindowSelector(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init(context);
     }

@@ -18,8 +18,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import androidx.annotation.Nullable;
-
 public class CoordinatesView extends View {
 
     private final static String TAG = CoordinatesView.class.getSimpleName();
@@ -68,12 +66,12 @@ public class CoordinatesView extends View {
         init(context);
     }
 
-    public CoordinatesView(Context context, @Nullable AttributeSet attrs) {
+    public CoordinatesView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init(context);
     }
 
-    public CoordinatesView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public CoordinatesView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init(context);
     }

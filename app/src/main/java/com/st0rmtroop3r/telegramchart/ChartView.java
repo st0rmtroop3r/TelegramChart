@@ -12,8 +12,6 @@ import android.view.View;
 import java.util.ArrayList;
 import java.util.List;
 
-import androidx.annotation.Nullable;
-
 public class ChartView extends View {
 
     private final static String TAG = ChartView.class.getSimpleName();
@@ -37,11 +35,11 @@ public class ChartView extends View {
         super(context);
     }
 
-    public ChartView(Context context, @Nullable AttributeSet attrs) {
+    public ChartView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public ChartView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public ChartView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
 

@@ -6,8 +6,6 @@ import android.view.LayoutInflater;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import androidx.annotation.Nullable;
-
 public class BadgeItem extends LinearLayout {
 
     private TextView txvChartValue;
@@ -18,12 +16,12 @@ public class BadgeItem extends LinearLayout {
         init(context);
     }
 
-    public BadgeItem(Context context, @Nullable AttributeSet attrs) {
+    public BadgeItem(Context context, AttributeSet attrs) {
         super(context, attrs);
         init(context);
     }
 
-    public BadgeItem(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public BadgeItem(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init(context);
     }
