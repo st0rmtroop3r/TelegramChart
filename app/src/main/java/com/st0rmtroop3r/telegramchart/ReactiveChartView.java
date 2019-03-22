@@ -7,8 +7,10 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.AttributeSet;
-import android.util.Pair;
 import android.view.MotionEvent;
+
+import com.st0rmtroop3r.telegramchart.enitity.Chart;
+import com.st0rmtroop3r.telegramchart.enitity.ChartLine;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -89,11 +91,11 @@ public class ReactiveChartView extends ChartView {
     }
 
     @Override
-    void setChartsData(List<Pair<int[], Integer>> chartsData) {
-        super.setChartsData(chartsData);
+    void setChartsData(Chart chart) {
+        super.setChartsData(chart);
         circles.clear();
-        for (Pair pair : chartsData) {
-            circles.add(new Circle((Integer) pair.second));
+        for (ChartLine chartLine : chart.chartLines) {
+            circles.add(new Circle(Color.parseColor(chartLine.color)));
         }
     }
 
@@ -129,7 +131,7 @@ public class ReactiveChartView extends ChartView {
 
         badge.removeValues();
         for (int i = 0; i < charts.size(); i++) {
-            Chart chart = charts.get(i);
+            ChartLineView chart = charts.get(i);
             circles.get(i).setCoordinates(xCoordinate, viewHeight - chart.heightInterval * chart.data[dataIndex]);
             badge.addValue("" + chart.data[dataIndex], "Joined", chart.paint.getColor());
         }

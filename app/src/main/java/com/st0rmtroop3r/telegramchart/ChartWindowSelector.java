@@ -2,13 +2,14 @@ package com.st0rmtroop3r.telegramchart;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.AttributeSet;
-import android.util.Pair;
 import android.view.MotionEvent;
 
-import java.util.List;
+import com.st0rmtroop3r.telegramchart.enitity.Chart;
+import com.st0rmtroop3r.telegramchart.enitity.ChartLine;
 
 public class ChartWindowSelector extends ChartView {
 
@@ -39,17 +40,16 @@ public class ChartWindowSelector extends ChartView {
     }
 
     @Override
-    void setChartsData(List<Pair<int[], Integer>> chartsData) {
+    void setChartsData(Chart chart) {
+        xAxisLength = chart.xData.length - 1;
         yAxisMaxValue = 0;
-        for (Pair<int[], Integer> pair : chartsData) {
-            int[] data = pair.first;
-            ChameleonChart chart = new ChameleonChart(data, pair.second);
-            charts.add(chart);
-            if (yAxisMaxValue < chart.yAxisMax) {
-                yAxisMaxValue = chart.yAxisMax;
+        charts.clear();
+        for (ChartLine chartLine : chart.chartLines) {
+            ChameleonChartLine chartLineView = new ChameleonChartLine(chartLine.yData, Color.parseColor(chartLine.color));
+            charts.add(chartLineView);
+            if (yAxisMaxValue < chartLineView.yAxisMax) {
+                yAxisMaxValue = chartLineView.yAxisMax;
             }
-            xAxisLength = data.length - 1;
-
         }
         if (viewWidth > 0 && viewHeight > 0) {
             updateView();
@@ -63,8 +63,8 @@ public class ChartWindowSelector extends ChartView {
         canvas.drawRect(window.leftDimRect, window.sideDimPaint);
         canvas.drawRect(window.rightDimRect, window.sideDimPaint);
         canvas.clipRect(window.windowLeft(), 0, window.windowRight(), viewHeight);
-        for (Chart chart : charts) {
-            canvas.drawPath(chart.path, ((ChameleonChart)chart).paintSolid);
+        for (ChartLineView chart : charts) {
+            canvas.drawPath(chart.path, ((ChameleonChartLine)chart).paintSolid);
         }
     }
 
@@ -227,21 +227,29 @@ public class ChartWindowSelector extends ChartView {
         }
 
         void moveLeftBorder(int x) {
-            if (windowRight() - x >= minWindowWidth) {
-                windowLeft(x);
-                leftDimRect.right = windowLeft();
-                invalidate();
-                notifyListener(windowLeft(), windowRight());
+            int left = windowRight() - minWindowWidth;
+            if (x < 0) {
+                left = 0;
+            } else if (windowRight() - x >= minWindowWidth) {
+                left = x;
             }
+            windowLeft(left);
+            leftDimRect.right = windowLeft();
+            invalidate();
+            notifyListener(windowLeft(), windowRight());
         }
 
         void moveRightBorder(int x) {
-            if (x - windowLeft() >= minWindowWidth) {
-                windowRight(x);
-                rightDimRect.left = windowRight();
-                invalidate();
-                notifyListener(windowLeft(), windowRight());
+            int right = windowLeft() + minWindowWidth;
+            if (x > viewWidth) {
+                right = viewWidth;
+            } else if (x - windowLeft() >= minWindowWidth) {
+                right = x;
             }
+            windowRight(right);
+            rightDimRect.left = windowRight();
+            invalidate();
+            notifyListener(windowLeft(), windowRight());
         }
 
         void onViewSizeChanged(int width, int height) {
@@ -280,11 +288,11 @@ public class ChartWindowSelector extends ChartView {
         }
     }
 
-    class ChameleonChart extends Chart {
+    class ChameleonChartLine extends ChartLineView {
 
         Paint paintSolid;
 
-        ChameleonChart(int[] data, int color) {
+        ChameleonChartLine(int[] data, int color) {
             super(data, color);
             paintSolid = new Paint(paint);
             paint.setAlpha((int) (255 * 0.6));

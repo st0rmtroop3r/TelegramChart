@@ -8,6 +8,6 @@ public class ChartLine {
 
     public String color;
 
-    public long[] yData;
+    public int[] yData;
 
 }

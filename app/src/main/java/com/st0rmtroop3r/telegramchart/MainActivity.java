@@ -1,13 +1,21 @@
 package com.st0rmtroop3r.telegramchart;
 
 import android.app.Activity;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.Pair;
+import android.view.LayoutInflater;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 
 import com.st0rmtroop3r.telegramchart.enitity.Chart;
+import com.st0rmtroop3r.telegramchart.enitity.ChartLine;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +46,7 @@ public class MainActivity extends Activity {
         ChartWindowSelector chartWindowSelector = findViewById(R.id.selector);
         LinearLayout checkBoxes = findViewById(R.id.ll_checkBoxes);
         CoordinatesView coordinatesView = findViewById(R.id.coordinates);
+        LinearLayout checkboxes = findViewById(R.id.grl_checkboxes);
 
         reactiveChartView.badge = findViewById(R.id.grid);
 
@@ -48,8 +57,9 @@ public class MainActivity extends Activity {
         list.add(new Pair<>(y0pair.first, Color.parseColor(y0pair.second)));
         list.add(new Pair<>(y1pair.first, Color.parseColor(y1pair.second)));
 
-        chartWindowSelector.setChartsData(list);
-        reactiveChartView.setChartsData(list);
+        Chart chart = charts.get(4);
+        chartWindowSelector.setChartsData(chart);
+        reactiveChartView.setChartsData(chart);
         chartWindowSelector.setSelectionListener((left, right) -> {
             reactiveChartView.setZoomRange(left, right);
             coordinatesView.setXAxisDataRange(left, right);
@@ -68,6 +78,27 @@ public class MainActivity extends Activity {
 
         coordinatesView.setXAxisData(DataProvider.x);
         coordinatesView.setXAxisDataRange(.34f, .78f);
+
+        for (ChartLine chartLine : chart.chartLines) {
+            CheckBox cb = (CheckBox) LayoutInflater.from(this).inflate(R.layout.chart_checkbox, checkboxes, false);
+            cb.setText(chartLine.name);
+
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                Drawable drawable = getResources().getDrawable(R.drawable.btn_check);
+                drawable.setColorFilter(Color.parseColor(chartLine.color), PorterDuff.Mode.SRC_IN);
+                cb.setButtonDrawable(drawable);
+            } else {
+                cb.setButtonTintList(ColorStateList.valueOf(Color.parseColor(chartLine.color)));
+            }
+
+            checkboxes.addView(cb);
+            cb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+                }
+            });
+        }
 
         Log.i(TAG, "mainActivity: xMax.length = " + DataProvider.xMax.length);
     }

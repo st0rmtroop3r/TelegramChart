@@ -169,9 +169,9 @@ public class DataProvider {
             if (pair.first.startsWith("y")) {
                 ChartLine chartLine = new ChartLine();
                 chartLine.id = pair.first;
-                chartLine.yData = new long[pair.second.size()];
+                chartLine.yData = new int[pair.second.size()];
                 for (int i = 0; i < pair.second.size(); i++) {
-                    chartLine.yData[i] = pair.second.get(i);
+                    chartLine.yData[i] = pair.second.get(i).intValue();
                 }
                 chart.chartLines.add(chartLine);
             }
