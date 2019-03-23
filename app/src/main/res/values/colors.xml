@@ -15,4 +15,7 @@
 
     <color name="asda">#2F302B</color>
 
+    <color name="text_color">#96A2AA</color>
+    <color name="line_color">#F1F1F2</color>
+
 </resources>

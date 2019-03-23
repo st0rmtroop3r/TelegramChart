@@ -1,5 +1,6 @@
 package com.st0rmtroop3r.telegramchart;
 
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -20,6 +21,7 @@ public class ChartView extends View {
 
     protected final ArrayList<ChartLineView> charts = new ArrayList<>();
     protected int yAxisMaxValue = 0;
+    protected int targetYAxisMaxValue = 0;
     protected int xAxisLength = 0;
     protected float xInterval = 0;
     protected int viewWidth = 0;
@@ -28,10 +30,13 @@ public class ChartView extends View {
     protected float xTo = 1;
     protected float totalScaledWidth;
     protected float xOffset;
+    protected int paddingTop = 0;
+    protected int paddingBottom = 0;
     protected int leftPadding = 0;
     protected int rightPadding = 0;
     protected int totalXPadding = leftPadding + rightPadding;
     protected float chartStrokeWidth = 10;
+    private ValueAnimator valueAnimator;
 
     public ChartView(Context context) {
         super(context);
@@ -47,8 +52,8 @@ public class ChartView extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        for (ChartLineView chart : charts) {
-            canvas.drawPath(chart.path, chart.paint);
+        for (int i = charts.size() - 1; i >= 0 ; i--) {
+            canvas.drawPath(charts.get(i).path, charts.get(i).paint);
         }
     }
 
@@ -58,6 +63,8 @@ public class ChartView extends View {
         Log.w(TAG, "onSizeChanged: w: " + w + ", h: " + h);
         viewWidth = w;
         viewHeight = h;
+        paddingTop = getPaddingTop();
+        paddingBottom = getPaddingBottom();
         leftPadding = getPaddingLeft();
         rightPadding = getPaddingRight();
         totalXPadding = leftPadding + rightPadding;
@@ -65,17 +72,37 @@ public class ChartView extends View {
         updateView();
     }
 
+    void setYAxisMaxValue(int newValue) {
+        if (newValue == targetYAxisMaxValue) return;
+        Log.w(TAG, "setYAxisMaxValue: newValue " + newValue + ", yAxisMaxValue " + yAxisMaxValue);
+        targetYAxisMaxValue = newValue;
+        int oldValue = yAxisMaxValue;
+        if (valueAnimator != null) {
+            oldValue = (int) valueAnimator.getAnimatedValue();
+            valueAnimator.cancel();
+            valueAnimator.removeAllUpdateListeners();
+        }
+        valueAnimator = ValueAnimator.ofInt(oldValue, targetYAxisMaxValue);
+        valueAnimator.addUpdateListener(animation -> {
+            yAxisMaxValue = (int) animation.getAnimatedValue();
+            updateView();
+        });
+        valueAnimator.start();
+    }
+
     void setChartsData(Chart chart) {
         xAxisLength = chart.xData.length - 1;
         yAxisMaxValue = 0;
         charts.clear();
         for (ChartLine chartLine : chart.chartLines) {
-            ChartLineView chartLineView = new ChartLineView(chartLine.yData, Color.parseColor(chartLine.color));
+            ChartLineView chartLineView = new ChartLineView(chartLine.yData,
+                    Color.parseColor(chartLine.color), chartLine.name);
             charts.add(chartLineView);
             if (yAxisMaxValue < chartLineView.yAxisMax) {
                 yAxisMaxValue = chartLineView.yAxisMax;
             }
         }
+        valueAnimator = ValueAnimator.ofInt(yAxisMaxValue, yAxisMaxValue);
         if (viewWidth > 0 && viewHeight > 0) {
             updateView();
         }
@@ -92,7 +119,6 @@ public class ChartView extends View {
         float range = xTo - xFrom;
         totalScaledWidth = viewWidth / range;
         xInterval = (totalScaledWidth - totalXPadding) / xAxisLength;
-
         xOffset = -totalScaledWidth * xFrom;
 
         int fromDataIndex = (int) (xAxisLength * xFrom);
@@ -108,9 +134,9 @@ public class ChartView extends View {
     private void setupChartsPath(float dataFromX, int fromDataIndex) {
 
         for (ChartLineView chart : charts) {
-            chart.heightInterval = (float) viewHeight / yAxisMaxValue;
+            chart.heightInterval = (float) (viewHeight - paddingBottom - paddingTop) / yAxisMaxValue;
             chart.path.reset();
-            chart.path.moveTo(dataFromX, viewHeight - chart.heightInterval * chart.data[fromDataIndex]);
+            chart.path.moveTo(dataFromX, viewHeight - paddingBottom - chart.heightInterval * chart.data[fromDataIndex]);
         }
 
         for (int i = 1; dataFromX + xInterval * i < viewWidth + xInterval; i++) {
@@ -118,7 +144,7 @@ public class ChartView extends View {
             for (ChartLineView chart : charts) {
                 try {
                     chart.path.lineTo(dataFromX + xInterval * i,
-                            viewHeight - chart.heightInterval * chart.data[fromDataIndex + i]);
+                            viewHeight - paddingBottom - chart.heightInterval * chart.data[fromDataIndex + i]);
                 } catch (ArrayIndexOutOfBoundsException e) {
                     break;
                 }
@@ -129,13 +155,15 @@ public class ChartView extends View {
     class ChartLineView {
 
         Path path = new Path();
-        Paint paint = new Paint();
+        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         int[] data;
+        String name;
         int yAxisMax = 0;
         float heightInterval;
 
-        ChartLineView(int[] data, int color) {
+        ChartLineView(int[] data, int color, String name) {
             this.data = data;
+            this.name = name;
             Log.w(TAG, "ChartLineView: data.length = " + data.length);
             for (int aData : data) {
                 if (aData > yAxisMax) yAxisMax = aData;

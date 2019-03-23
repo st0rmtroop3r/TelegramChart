@@ -8,6 +8,8 @@
         android:id="@+id/coordinates"
         android:layout_width="match_parent"
         android:layout_height="@dimen/coordinates_height"
+        android:paddingTop="@dimen/coordinates_x_padding"
+        android:paddingBottom="30dp"
         android:layout_alignParentTop="true" />
 
     <com.st0rmtroop3r.telegramchart.ReactiveChartView
@@ -15,6 +17,7 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/chart_height"
         android:layout_alignParentTop="true"
+        android:paddingTop="@dimen/coordinates_x_padding"
         android:paddingLeft="@dimen/margin_horizontal"
         android:paddingStart="@dimen/margin_horizontal"
         android:paddingRight="@dimen/margin_horizontal"
@@ -25,10 +28,14 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_below="@id/coordinates"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
         android:layout_marginLeft="@dimen/margin_horizontal"
         android:layout_marginStart="@dimen/margin_horizontal"
         android:layout_marginRight="@dimen/margin_horizontal"
-        android:layout_marginEnd="@dimen/margin_horizontal" />
+        android:layout_marginEnd="@dimen/margin_horizontal"
+        android:paddingTop="2dp"
+        />
 
     <LinearLayout
         android:id="@+id/ll_checkBoxes"
@@ -66,6 +73,5 @@
             />
 
     </ScrollView>
-
 
 </RelativeLayout>

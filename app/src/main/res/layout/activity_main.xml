@@ -2,38 +2,39 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
     <com.st0rmtroop3r.telegramchart.CoordinatesView
         android:id="@+id/coordinates"
         android:layout_width="match_parent"
         android:layout_height="@dimen/coordinates_height"
-        android:layout_alignParentTop="true"
-        />
+        android:paddingTop="@dimen/coordinates_x_padding"
+        android:paddingBottom="30dp"
+        android:layout_alignParentTop="true" />
 
     <com.st0rmtroop3r.telegramchart.ReactiveChartView
         android:id="@+id/reactive"
         android:layout_width="match_parent"
         android:layout_height="@dimen/chart_height"
         android:layout_alignParentTop="true"
+        android:paddingTop="@dimen/coordinates_x_padding"
         android:paddingLeft="@dimen/margin_horizontal"
         android:paddingStart="@dimen/margin_horizontal"
         android:paddingRight="@dimen/margin_horizontal"
-        android:paddingEnd="@dimen/margin_horizontal"
-        />
+        android:paddingEnd="@dimen/margin_horizontal" />
 
     <com.st0rmtroop3r.telegramchart.ChartWindowSelector
         android:id="@+id/selector"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_below="@id/coordinates"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
         android:layout_marginLeft="@dimen/margin_horizontal"
         android:layout_marginStart="@dimen/margin_horizontal"
         android:layout_marginRight="@dimen/margin_horizontal"
         android:layout_marginEnd="@dimen/margin_horizontal"
-
+        android:paddingTop="2dp"
         />
 
     <LinearLayout
@@ -41,8 +42,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_below="@id/selector"
-        />
+        android:layout_below="@id/selector" />
 
     <com.st0rmtroop3r.telegramchart.Badge
         android:id="@+id/grid"
@@ -73,6 +73,5 @@
             />
 
     </ScrollView>
-
 
 </RelativeLayout>

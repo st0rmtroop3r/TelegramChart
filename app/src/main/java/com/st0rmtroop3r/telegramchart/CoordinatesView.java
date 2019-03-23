@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
@@ -12,6 +13,9 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.AttributeSet;
 import android.view.View;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.DecelerateInterpolator;
+import android.view.animation.Interpolator;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -24,7 +28,8 @@ public class CoordinatesView extends View {
 
     private int linesCount = 5;
     private int paddingX = 50;
-    private int paddingY = 150;
+    private int paddingTop = 150;
+    private int paddingBottom = 100;
     private int yMarkPaddingLine = 20;
     private int lineInterval;
     private int baseLine;
@@ -40,9 +45,9 @@ public class CoordinatesView extends View {
     private int lineColor = Color.LTGRAY;
 
     private final Matrix matrix = new Matrix();
-    private final Paint textPaint = new Paint();
+    private final Paint textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Path xAxisLinePath = new Path();
-    private final Paint xAxisLinePaint = new Paint();
+    private final Paint xAxisLinePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Path yMarkLinesPath = new Path();
     private final AxisMark yStartMark = new AxisMark();
 
@@ -56,10 +61,6 @@ public class CoordinatesView extends View {
     private float xAxisDataRangeTo;
 
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MMM dd");
-
-    // debug
-    int debugCircleY;
-    Paint dPaint = new Paint(textPaint);
 
     public CoordinatesView(Context context) {
         super(context);
@@ -81,8 +82,10 @@ public class CoordinatesView extends View {
         super.onSizeChanged(w, h, oldw, oldh);
         viewWidth = w;
         viewHeight = h;
-        lineInterval = (viewHeight - 2 * paddingY) / (linesCount);
-        baseLine = viewHeight - paddingY;
+        paddingTop = getPaddingTop();
+        paddingBottom = getPaddingBottom();
+        lineInterval = (viewHeight - paddingBottom - paddingTop) / (linesCount);
+        baseLine = viewHeight - paddingBottom;
         initLines();
         initMarks();
         xAxis.applyXDataRange();
@@ -99,35 +102,25 @@ public class CoordinatesView extends View {
         }
 
         xAxis.draw(canvas);
-
-        // debug
-        if (yAxisAnimators.isEmpty()) return;
-        int chartHeight = baseLine - yAxisAnimators.get(0).yMarks[4].y - yMarkPaddingLine;
-        float scale = yAxisMaxValue / Float.parseFloat(yAxisAnimators.get(0).yMarks[4].text);
-        debugCircleY = (int) (baseLine - chartHeight * scale);
-        canvas.drawCircle(viewWidth / 2, debugCircleY, 10, textPaint);
-//        Log.w(TAG, "onDraw: " + yAxisMaxValue + ", chartHeight " + chartHeight + ", scale "
-//                + scale + ", debugCircleY " + debugCircleY + ", mark.y " + yAxisAnimators.get(0).yMarks[4].y);
     }
 
     private void init(Context context) {
 
+        Resources resources = context.getResources();
+        textColor = resources.getColor(R.color.text_color);
+        lineColor = resources.getColor(R.color.line_color);
+
         textPaint.setColor(textColor);
-        textPaint.setTextSize(60);
+        textPaint.setTextSize(resources.getDimension(R.dimen.coordinates_text_size));
 
         xAxisLinePaint.setColor(lineColor);
         xAxisLinePaint.setStyle(Paint.Style.STROKE);
         xAxisLinePaint.setStrokeCap(Paint.Cap.ROUND);
-        xAxisLinePaint.setStrokeWidth(3f);
+        xAxisLinePaint.setStrokeWidth(resources.getDimension(R.dimen.x_axis_line_width));
 
         yStartMark.text = "0";
 
-        paddingY = context.getResources().getDimensionPixelSize(R.dimen.coordinates_x_padding);
-
         xAxis = new XAxis();
-
-        dPaint.setColor(Color.GREEN);
-        dPaint.setTextSize(60);
     }
 
     private void initLines() {
@@ -149,11 +142,10 @@ public class CoordinatesView extends View {
 
         if (newValue == yAxisMaxValue) return;
 
-        int axisMax = (int) (Math.ceil((float)newValue/5)*5);
-        int axisInterval = axisMax / linesCount;
-
         boolean scrollUp = newValue < yAxisMaxValue;
         yAxisMaxValue = newValue;
+
+        int axisInterval = yAxisMaxValue / linesCount;
 
         AxisMark[] newYMarks = new AxisMark[linesCount];
         for (int i = 0; i < newYMarks.length; i++) {
@@ -316,6 +308,8 @@ public class CoordinatesView extends View {
         ValueAnimator markFadeAnimator;
         ValueAnimator lineFadeAnimator;
         ValueAnimator scaleAnimator;
+        Interpolator accelerateInterpolator = new AccelerateInterpolator();
+        Interpolator decelerateInterpolator = new DecelerateInterpolator();
         boolean up;
 
         YAxisAnimator(AxisMark[] marks) {
@@ -368,6 +362,7 @@ public class CoordinatesView extends View {
 
         void initInAnimators(boolean scrollUp) {
             markFadeAnimator = ValueAnimator.ofObject(argbEvaluator, Color.TRANSPARENT, textColor);
+            markFadeAnimator.setInterpolator(accelerateInterpolator);
             lineFadeAnimator = ValueAnimator.ofObject(argbEvaluator, Color.TRANSPARENT, lineColor);
             float scaleFrom = scrollUp ? 0.4f : 2.5f;
             scaleAnimator = ValueAnimator.ofFloat(scaleFrom, 1);
@@ -375,6 +370,7 @@ public class CoordinatesView extends View {
 
         void initOutAnimators(boolean sweepOutUp, int lastMarkFadeValue, int lastLineFadeValue, float lastScaleValue) {
             markFadeAnimator = ValueAnimator.ofObject(argbEvaluator, lastMarkFadeValue, Color.TRANSPARENT);
+            markFadeAnimator.setInterpolator(decelerateInterpolator);
             lineFadeAnimator = ValueAnimator.ofObject(argbEvaluator, lastLineFadeValue, Color.TRANSPARENT);
             float scaleTo = sweepOutUp ? 2.5f : 0.4f;
             scaleAnimator = ValueAnimator.ofFloat(lastScaleValue, scaleTo);

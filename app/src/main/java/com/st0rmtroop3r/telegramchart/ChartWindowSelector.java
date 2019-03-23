@@ -1,6 +1,7 @@
 package com.st0rmtroop3r.telegramchart;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -18,10 +19,18 @@ public class ChartWindowSelector extends ChartView {
     private final int touchableHalfWidth = 50;
     private WindowFrame window;
     private SelectionListener listener;
+    private int defaultWindowWidth = 400;
+    private int minWindowWidth = 300;
+    private int frameSideWidth = 20;
 
     private void init(Context context) {
+        Resources resources = context.getResources();
+        chartStrokeWidth = resources.getDimension(R.dimen.selector_chart_stroke_width);
+        defaultWindowWidth = resources.getDimensionPixelSize(R.dimen.selector_window_default_width);
+        minWindowWidth = resources.getDimensionPixelSize(R.dimen.selector_window_min_width);
+        frameSideWidth = resources.getDimensionPixelSize(R.dimen.selector_window_frame_width);
+        frameSideWidth = frameSideWidth / 2 * 2;
         window = new WindowFrame(context);
-        chartStrokeWidth = 5;
     }
 
     public ChartWindowSelector(Context context) {
@@ -45,7 +54,8 @@ public class ChartWindowSelector extends ChartView {
         yAxisMaxValue = 0;
         charts.clear();
         for (ChartLine chartLine : chart.chartLines) {
-            ChameleonChartLine chartLineView = new ChameleonChartLine(chartLine.yData, Color.parseColor(chartLine.color));
+            ChameleonChartLine chartLineView = new ChameleonChartLine(chartLine.yData,
+                    Color.parseColor(chartLine.color), chartLine.name);
             charts.add(chartLineView);
             if (yAxisMaxValue < chartLineView.yAxisMax) {
                 yAxisMaxValue = chartLineView.yAxisMax;
@@ -118,15 +128,12 @@ public class ChartWindowSelector extends ChartView {
     private class WindowFrame {
 
         Rect frameRect = new Rect();
-        Paint framePaint = new Paint();
+        Paint framePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
         Rect leftDimRect = new Rect();
         Rect rightDimRect = new Rect();
-        Paint sideDimPaint = new Paint();
+        Paint sideDimPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
-        private int defaultWindowWidth = 400;
-        private int minWindowWidth = 300;
-        private int frameSideWidth = 20;
         private int frameSideHalfWidth = frameSideWidth / 2;
         private WindowSection section = WindowSection.NONE;
         private int touchOffset;
@@ -292,8 +299,8 @@ public class ChartWindowSelector extends ChartView {
 
         Paint paintSolid;
 
-        ChameleonChartLine(int[] data, int color) {
-            super(data, color);
+        ChameleonChartLine(int[] data, int color, String name) {
+            super(data, color, name);
             paintSolid = new Paint(paint);
             paint.setAlpha((int) (255 * 0.6));
             paintSolid.setAntiAlias(true);
