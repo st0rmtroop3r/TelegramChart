@@ -134,13 +134,12 @@ public class ReactiveChartView extends ChartView {
         linePath.lineTo(xCoordinate, viewHeight);
 
         badge.removeValues();
-        for (int i = 0; i < charts.size(); i++) {
-            ChartLineView chart = charts.get(i);
+        for (int i = 0; i < chartLines.size(); i++) {
+            ChartLineView chart = chartLines.get(i);
             circles.get(i).setCoordinates(xCoordinate, viewHeight - chart.heightInterval * chart.data[dataIndex]);
             badge.addValue("" + chart.data[dataIndex], chart.name, chart.paint.getColor());
         }
-//        SimpleDateFormat
-//        badge.setTitle("Sat, Feb 25");
+
         badge.setTitle(new SimpleDateFormat("EEE, MMM dd").format(new Date(xData[dataIndex])));
         badge.setX(xCoordinate);
         badge.setVisibility(VISIBLE);

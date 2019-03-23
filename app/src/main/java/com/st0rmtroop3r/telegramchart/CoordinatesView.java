@@ -36,8 +36,8 @@ public class CoordinatesView extends View {
 
     private int viewWidth = 0;
     private int viewHeight = 0;
-    private int animDuration = 400;
-    private int xAxisMarkFadeDuration = 250;
+    private int animDuration = 300;
+    private int xAxisMarkFadeDuration = 150;
 
     private int yAxisMaxValue;
 

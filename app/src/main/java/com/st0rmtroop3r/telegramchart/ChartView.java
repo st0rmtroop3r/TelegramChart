@@ -1,5 +1,7 @@
 package com.st0rmtroop3r.telegramchart;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
@@ -19,7 +21,7 @@ public class ChartView extends View {
 
     private final static String TAG = ChartView.class.getSimpleName();
 
-    protected final ArrayList<ChartLineView> charts = new ArrayList<>();
+    protected final ArrayList<ChartLineView> chartLines = new ArrayList<>();
     protected int yAxisMaxValue = 0;
     protected int targetYAxisMaxValue = 0;
     protected int xAxisLength = 0;
@@ -36,7 +38,7 @@ public class ChartView extends View {
     protected int rightPadding = 0;
     protected int totalXPadding = leftPadding + rightPadding;
     protected float chartStrokeWidth = 10;
-    private ValueAnimator valueAnimator;
+    private ValueAnimator yAxisMaxValueAnimator;
 
     public ChartView(Context context) {
         super(context);
@@ -52,15 +54,17 @@ public class ChartView extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        for (int i = charts.size() - 1; i >= 0 ; i--) {
-            canvas.drawPath(charts.get(i).path, charts.get(i).paint);
+        for (int i = chartLines.size() - 1; i >= 0 ; i--) {
+            ChartLineView lineView = chartLines.get(i);
+            if (lineView.draw) {
+                canvas.drawPath(lineView.path, lineView.paint);
+            }
         }
     }
 
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-        Log.w(TAG, "onSizeChanged: w: " + w + ", h: " + h);
         viewWidth = w;
         viewHeight = h;
         paddingTop = getPaddingTop();
@@ -68,41 +72,41 @@ public class ChartView extends View {
         leftPadding = getPaddingLeft();
         rightPadding = getPaddingRight();
         totalXPadding = leftPadding + rightPadding;
-        Log.w(TAG, "onSizeChanged: rightPadding = " + rightPadding + ", leftPadding = " + leftPadding);
         updateView();
     }
 
     void setYAxisMaxValue(int newValue) {
         if (newValue == targetYAxisMaxValue) return;
-        Log.w(TAG, "setYAxisMaxValue: newValue " + newValue + ", yAxisMaxValue " + yAxisMaxValue);
         targetYAxisMaxValue = newValue;
         int oldValue = yAxisMaxValue;
-        if (valueAnimator != null) {
-            oldValue = (int) valueAnimator.getAnimatedValue();
-            valueAnimator.cancel();
-            valueAnimator.removeAllUpdateListeners();
+
+        if (yAxisMaxValueAnimator != null) {
+            oldValue = (int) yAxisMaxValueAnimator.getAnimatedValue();
+            yAxisMaxValueAnimator.cancel();
+            yAxisMaxValueAnimator.removeAllUpdateListeners();
         }
-        valueAnimator = ValueAnimator.ofInt(oldValue, targetYAxisMaxValue);
-        valueAnimator.addUpdateListener(animation -> {
+        yAxisMaxValueAnimator = ValueAnimator.ofInt(oldValue, targetYAxisMaxValue);
+        yAxisMaxValueAnimator.addUpdateListener(animation -> {
             yAxisMaxValue = (int) animation.getAnimatedValue();
             updateView();
         });
-        valueAnimator.start();
+        yAxisMaxValueAnimator.setDuration(300);
+        yAxisMaxValueAnimator.start();
     }
 
     void setChartsData(Chart chart) {
         xAxisLength = chart.xData.length - 1;
         yAxisMaxValue = 0;
-        charts.clear();
+        chartLines.clear();
         for (ChartLine chartLine : chart.chartLines) {
             ChartLineView chartLineView = new ChartLineView(chartLine.yData,
-                    Color.parseColor(chartLine.color), chartLine.name);
-            charts.add(chartLineView);
+                    Color.parseColor(chartLine.color), chartLine.name, chartLine.id);
+            chartLines.add(chartLineView);
             if (yAxisMaxValue < chartLineView.yAxisMax) {
                 yAxisMaxValue = chartLineView.yAxisMax;
             }
         }
-        valueAnimator = ValueAnimator.ofInt(yAxisMaxValue, yAxisMaxValue);
+        yAxisMaxValueAnimator = ValueAnimator.ofInt(yAxisMaxValue, yAxisMaxValue);
         if (viewWidth > 0 && viewHeight > 0) {
             updateView();
         }
@@ -112,6 +116,14 @@ public class ChartView extends View {
         xFrom = fromPercent;
         xTo = toPercent;
         updateView();
+    }
+
+    void setLineVisible(String lineId, boolean visible) {
+        for (ChartLineView line : chartLines) {
+            if (line.id.equals(lineId)) {
+                line.setVisible(visible);
+            }
+        }
     }
 
     protected void updateView() {
@@ -133,7 +145,7 @@ public class ChartView extends View {
 
     private void setupChartsPath(float dataFromX, int fromDataIndex) {
 
-        for (ChartLineView chart : charts) {
+        for (ChartLineView chart : chartLines) {
             chart.heightInterval = (float) (viewHeight - paddingBottom - paddingTop) / yAxisMaxValue;
             chart.path.reset();
             chart.path.moveTo(dataFromX, viewHeight - paddingBottom - chart.heightInterval * chart.data[fromDataIndex]);
@@ -141,13 +153,11 @@ public class ChartView extends View {
 
         for (int i = 1; dataFromX + xInterval * i < viewWidth + xInterval; i++) {
 
-            for (ChartLineView chart : charts) {
+            for (ChartLineView chart : chartLines) {
                 try {
                     chart.path.lineTo(dataFromX + xInterval * i,
                             viewHeight - paddingBottom - chart.heightInterval * chart.data[fromDataIndex + i]);
-                } catch (ArrayIndexOutOfBoundsException e) {
-                    break;
-                }
+                } catch (ArrayIndexOutOfBoundsException e) {}
             }
         }
     }
@@ -158,12 +168,19 @@ public class ChartView extends View {
         Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         int[] data;
         String name;
+        String id;
+        int color;
         int yAxisMax = 0;
         float heightInterval;
+        boolean draw = true;
+        boolean visible = true;
+        ChartLineAnimator animator;
 
-        ChartLineView(int[] data, int color, String name) {
+        ChartLineView(int[] data, int color, String name, String id) {
             this.data = data;
             this.name = name;
+            this.id = id;
+            this.color = color;
             Log.w(TAG, "ChartLineView: data.length = " + data.length);
             for (int aData : data) {
                 if (aData > yAxisMax) yAxisMax = aData;
@@ -175,6 +192,109 @@ public class ChartView extends View {
             paint.setStrokeCap(Paint.Cap.ROUND);
             paint.setStrokeWidth(chartStrokeWidth);
 
+            animator = new ChartLineAnimator(this);
+        }
+
+        void setVisible(boolean visible) {
+            this.visible = visible;
+            if (visible) {
+                animator.showChartLine();
+            } else {
+                animator.hideChartLine();
+            }
+        }
+    }
+
+    class ChartLineAnimator {
+
+        long animationDuration = 300;
+        ChartLineView lineView;
+        ValueAnimator alphaInAnimator = ValueAnimator.ofInt(0, 255);
+        ValueAnimator alphaOutAnimator = ValueAnimator.ofInt(255, 0);
+        AlphaUpdateListener alphaListener;
+        AnimationListener animationListener;
+
+        ChartLineAnimator(ChartLineView view) {
+            lineView = view;
+            alphaInAnimator.setDuration(animationDuration);
+            alphaOutAnimator.setDuration(animationDuration);
+            alphaListener = new AlphaUpdateListener(view);
+            animationListener = new AnimationListener(view);
+        }
+
+        void showChartLine() {
+
+            lineView.draw = true;
+
+            int alphaFrom = 0;
+            if (alphaOutAnimator.isStarted()) {
+                alphaOutAnimator.cancel();
+                alphaFrom = (int) alphaOutAnimator.getAnimatedValue();
+            }
+
+            alphaInAnimator = ValueAnimator.ofInt(alphaFrom, 255);
+            setupAnimator(alphaInAnimator, alphaListener);
+
+            alphaInAnimator.start();
+        }
+
+        void hideChartLine() {
+
+            lineView.draw = true;
+
+            int alphaFrom = 255;
+            if (alphaInAnimator.isStarted()) {
+                alphaInAnimator.cancel();
+                alphaFrom = (int) alphaInAnimator.getAnimatedValue();
+            }
+
+            alphaOutAnimator = ValueAnimator.ofInt(alphaFrom, 0);
+            setupAnimator(alphaOutAnimator, alphaListener);
+
+            alphaOutAnimator.start();
+        }
+
+        void setupAnimator(ValueAnimator animator, ValueAnimator.AnimatorUpdateListener listener) {
+            animator.addUpdateListener(listener);
+            animator.addListener(animationListener);
+            animator.setDuration(animationDuration);
+        }
+    }
+
+    class AlphaUpdateListener implements ValueAnimator.AnimatorUpdateListener {
+
+        ChartLineView lineView;
+
+        AlphaUpdateListener(ChartLineView view) {
+            lineView = view;
+        }
+
+        @Override
+        public void onAnimationUpdate(ValueAnimator animation) {
+            lineView.paint.setAlpha((int) animation.getAnimatedValue());
+            updateView();
+        }
+    }
+
+    class AnimationListener extends AnimatorListenerAdapter {
+
+        ChartLineView lineView;
+
+        AnimationListener(ChartLineView view) {
+            lineView = view;
+        }
+
+        @Override
+        public void onAnimationCancel(Animator animation) {
+            ((ValueAnimator)animation).removeAllUpdateListeners();
+            animation.removeAllListeners();
+        }
+
+        @Override
+        public void onAnimationEnd(Animator animation) {
+            lineView.draw = lineView.visible;
+            ((ValueAnimator)animation).removeAllUpdateListeners();
+            animation.removeAllListeners();
         }
     }
 

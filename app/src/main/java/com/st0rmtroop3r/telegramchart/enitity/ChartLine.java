@@ -10,4 +10,6 @@ public class ChartLine {
 
     public int[] yData;
 
+    public boolean visible = true;
+
 }

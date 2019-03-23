@@ -52,11 +52,11 @@ public class ChartWindowSelector extends ChartView {
     void setChartsData(Chart chart) {
         xAxisLength = chart.xData.length - 1;
         yAxisMaxValue = 0;
-        charts.clear();
+        chartLines.clear();
         for (ChartLine chartLine : chart.chartLines) {
             ChameleonChartLine chartLineView = new ChameleonChartLine(chartLine.yData,
-                    Color.parseColor(chartLine.color), chartLine.name);
-            charts.add(chartLineView);
+                    Color.parseColor(chartLine.color), chartLine.name, chartLine.id);
+            chartLines.add(chartLineView);
             if (yAxisMaxValue < chartLineView.yAxisMax) {
                 yAxisMaxValue = chartLineView.yAxisMax;
             }
@@ -73,8 +73,10 @@ public class ChartWindowSelector extends ChartView {
         canvas.drawRect(window.leftDimRect, window.sideDimPaint);
         canvas.drawRect(window.rightDimRect, window.sideDimPaint);
         canvas.clipRect(window.windowLeft(), 0, window.windowRight(), viewHeight);
-        for (ChartLineView chart : charts) {
-            canvas.drawPath(chart.path, ((ChameleonChartLine)chart).paintSolid);
+        for (ChartLineView chart : chartLines) {
+            if (chart.draw) {
+                canvas.drawPath(chart.path, ((ChameleonChartLine)chart).paintSolid);
+            }
         }
     }
 
@@ -99,6 +101,14 @@ public class ChartWindowSelector extends ChartView {
             default:
                 return super.onTouchEvent(event);
         }
+    }
+
+    @Override
+    protected void updateView() {
+        for (ChartLineView line : chartLines) {
+            ((ChameleonChartLine)line).paintSolid.setAlpha(line.paint.getAlpha());
+        }
+        super.updateView();
     }
 
     public void setSelectionListener(SelectionListener selectionListener) {
@@ -299,8 +309,8 @@ public class ChartWindowSelector extends ChartView {
 
         Paint paintSolid;
 
-        ChameleonChartLine(int[] data, int color, String name) {
-            super(data, color, name);
+        ChameleonChartLine(int[] data, int color, String name, String id) {
+            super(data, color, name, id);
             paintSolid = new Paint(paint);
             paint.setAlpha((int) (255 * 0.6));
             paintSolid.setAntiAlias(true);
