@@ -106,6 +106,7 @@ public class ChartView extends View {
                 yAxisMaxValue = chartLineView.yAxisMax;
             }
         }
+        targetYAxisMaxValue = yAxisMaxValue;
         yAxisMaxValueAnimator = ValueAnimator.ofInt(yAxisMaxValue, yAxisMaxValue);
         if (viewWidth > 0 && viewHeight > 0) {
             updateView();

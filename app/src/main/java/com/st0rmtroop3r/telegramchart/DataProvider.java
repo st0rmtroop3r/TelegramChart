@@ -101,6 +101,37 @@ public class DataProvider {
         return new Pair<>(new int[]{1,0}, y1color);
     }
 
+    static List<Chart> getTest() {
+        List<Chart> charts = new ArrayList<>();
+        Chart chart = new Chart();
+        long[] longs = new long[5];
+        longs[0] = 50;
+        longs[1] = 0;
+        longs[2] = 100;
+        longs[3] = 0;
+        longs[4] = 50;
+        chart.xData = longs;
+
+        int[] ints = new int[5];
+        ints[0] = 50;
+        ints[1] = 0;
+        ints[2] = 100;
+        ints[3] = 0;
+        ints[4] = 50;
+
+        List<ChartLine> lines = new ArrayList<>();
+        ChartLine line = new ChartLine();
+        line.id = "y0";
+        line.name = "ololo";
+        line.visible = true;
+        line.color = "#ffffff";
+        line.yData = ints;
+        lines.add(line);
+        chart.chartLines = lines;
+        charts.add(chart);
+        return charts;
+    }
+
     static List<Chart> readChartsData(Context appContext, int resId) {
         List<Chart> charts = new ArrayList<>();
         InputStream in = appContext.getResources().openRawResource(resId);

@@ -3,7 +3,7 @@
 
     <dimen name="chart_height">290dp</dimen>
     <dimen name="coordinates_height">310dp</dimen>
-    <dimen name="coordinates_x_padding">20dp</dimen>
+    <dimen name="coordinates_bottom_padding">20dp</dimen>
     <dimen name="margin_horizontal">16dp</dimen>
     <dimen name="highlight_line">1dp</dimen>
     <dimen name="coordinates_text_size">12sp</dimen>

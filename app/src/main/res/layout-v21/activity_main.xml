@@ -18,7 +18,7 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/coordinates_height"
         android:paddingTop="30dp"
-        android:paddingBottom="@dimen/coordinates_x_padding"
+        android:paddingBottom="@dimen/coordinates_bottom_padding"
         android:layout_below="@id/spn_chart_selector" />
 
     <com.st0rmtroop3r.telegramchart.ReactiveChartView
@@ -26,7 +26,7 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/chart_height"
         android:layout_below="@id/spn_chart_selector"
-        android:paddingTop="@dimen/coordinates_x_padding"
+        android:paddingTop="30dp"
         android:paddingLeft="@dimen/margin_horizontal"
         android:paddingStart="@dimen/margin_horizontal"
         android:paddingRight="@dimen/margin_horizontal"
