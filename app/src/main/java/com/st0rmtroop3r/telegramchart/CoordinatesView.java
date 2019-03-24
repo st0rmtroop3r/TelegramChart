@@ -12,6 +12,7 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.AttributeSet;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
@@ -107,8 +108,12 @@ public class CoordinatesView extends View {
     private void init(Context context) {
 
         Resources resources = context.getResources();
-        textColor = resources.getColor(R.color.text_color);
-        lineColor = resources.getColor(R.color.line_color);
+        Resources.Theme theme = context.getTheme();
+        TypedValue typedValue = new TypedValue();
+        theme.resolveAttribute(R.attr.axis_marks_text_color, typedValue, true);
+        textColor = typedValue.data;
+        theme.resolveAttribute(R.attr.axis_lines_color, typedValue, true);
+        lineColor = typedValue.data;
 
         textPaint.setColor(textColor);
         textPaint.setTextSize(resources.getDimension(R.dimen.coordinates_text_size));

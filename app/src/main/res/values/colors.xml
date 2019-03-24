@@ -4,18 +4,32 @@
     <color name="colorPrimaryDark">#426382</color>
     <color name="colorAccent">#D81B60</color>
 
+
+    <color name="colorPrimary_dark">#212D3B</color>
+    <color name="colorPrimaryDark_dark">#1A242E</color>
+    <color name="window_background">#1D2733</color>
+
     <color name="white">#FFF</color>
     <color name="dark_grey">#222222</color>
     <color name="light_grey">#DDDDDD</color>
 
     <color name="highlight_line">#80CBD7DF</color>
+    <color name="highlight_line_dark">#131C26</color>
 
-    <color name="flexile_window_border">#80C9DBE9</color>
-    <color name="flexile_window_dim">#80F1F5Fd</color>
+    <color name="badge_background_light">#fff</color>
+    <color name="badge_background_dark">#202B38</color>
+    <color name="badge_title_dark">#E5EFF5</color>
 
-    <color name="asda">#2F302B</color>
+    <color name="window_selector_frame">#80C9DBE9</color>
+    <color name="window_selector_frame_dark">#BF325068</color>
+    <color name="window_selector_dim">#80F1F5Fd</color>
+    <color name="window_selector_dim_dark">#8019232E</color>
 
     <color name="text_color">#96A2AA</color>
+    <color name="text_color_dark">#506372</color>
     <color name="line_color">#F1F1F2</color>
+    <color name="line_color_dark">#161F2B</color>
+
+    <color name="divider_dark">#0B131E</color>
 
 </resources>

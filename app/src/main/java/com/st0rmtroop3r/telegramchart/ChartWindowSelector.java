@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.AttributeSet;
+import android.util.TypedValue;
 import android.view.MotionEvent;
 
 import com.st0rmtroop3r.telegramchart.enitity.Chart;
@@ -149,12 +150,16 @@ public class ChartWindowSelector extends ChartView {
         private int touchOffset;
 
         WindowFrame(Context context) {
+            Resources.Theme theme = context.getTheme();
+            TypedValue typedValue = new TypedValue();
+            theme.resolveAttribute(R.attr.window_selector_frame_color, typedValue, true);
+            framePaint.setColor(typedValue.data);
             framePaint.setStyle(Paint.Style.STROKE);
             framePaint.setStrokeWidth(frameSideWidth);
-            framePaint.setColor(context.getResources().getColor(R.color.flexile_window_border));
 
+            theme.resolveAttribute(R.attr.window_selector_dim_color, typedValue, true);
+            sideDimPaint.setColor(typedValue.data);
             sideDimPaint.setStyle(Paint.Style.FILL);
-            sideDimPaint.setColor(context.getResources().getColor(R.color.flexile_window_dim));
 
             frameRect.top = -5;
             leftDimRect.top = 0;

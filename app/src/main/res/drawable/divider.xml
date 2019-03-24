@@ -2,7 +2,7 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:left="48dp">
         <shape android:shape="rectangle">
-            <solid android:color="@color/light_grey" />
+            <solid android:color="?attr/line_checkbox_divider_color" />
             <size android:height="1px" />
         </shape>
     </item>

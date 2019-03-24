@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Telegram Chart</string>
+    <string name="statistics">Statistics</string>
+    <string name="menu_dark_mode">dark mode</string>
 </resources>

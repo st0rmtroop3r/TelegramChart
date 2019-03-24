@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.AttributeSet;
+import android.util.TypedValue;
 import android.view.MotionEvent;
 
 import com.st0rmtroop3r.telegramchart.enitity.Chart;
@@ -48,15 +49,21 @@ public class ReactiveChartView extends ChartView {
 
     private void init(Context context) {
         Resources resources = context.getResources();
-        chartStrokeWidth = resources.getDimension(R.dimen.reactive_chart_stroke_width);
+        Resources.Theme theme = context.getTheme();
+        TypedValue typedValue = new TypedValue();
+
+        theme.resolveAttribute(R.attr.highlight_line_color, typedValue, true);
+        linePaint.setColor(typedValue.data);
         linePaint.setStyle(Paint.Style.STROKE);
         linePaint.setStrokeJoin(Paint.Join.ROUND);
         linePaint.setStrokeCap(Paint.Cap.ROUND);
         linePaint.setStrokeWidth(resources.getDimension(R.dimen.highlight_line));
-        linePaint.setColor(resources.getColor(R.color.highlight_line));
 
-        innerCirclePaint.setColor(Color.WHITE);
+        theme.resolveAttribute(android.R.attr.windowBackground, typedValue, true);
+        innerCirclePaint.setColor(typedValue.data);
         innerCirclePaint.setStyle(Paint.Style.FILL);
+
+        chartStrokeWidth = resources.getDimension(R.dimen.reactive_chart_stroke_width);
     }
 
     @Override

@@ -1,14 +1,18 @@
 package com.st0rmtroop3r.telegramchart;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Pair;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
@@ -34,9 +38,15 @@ public class MainActivity extends Activity {
     private CoordinatesView coordinatesView;
     private ChartWindowSelector chartWindowSelector;
     private int chartRangeMaxValue;
+    private static final String PREF_THEME_DARK = "PREF_THEME_DARK";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        boolean dark = PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
+                .getBoolean(PREF_THEME_DARK, false);
+        setTheme(dark ? R.style.AppThemeDark : R.style.AppTheme);
+
         super.onCreate(savedInstanceState);
 
         mainActivity();
@@ -158,4 +168,28 @@ public class MainActivity extends Activity {
         }
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_dark_mode:
+                switchTheme();
+                return true;
+            default: return false;
+        }
+    }
+
+    private void switchTheme() {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        boolean dark = sharedPreferences.getBoolean(PREF_THEME_DARK, false);
+        sharedPreferences.edit()
+                .putBoolean(PREF_THEME_DARK, !dark)
+                .commit();
+        recreate();
+    }
 }

@@ -10,6 +10,31 @@
         <item name="android:colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="android:colorAccent">@color/colorAccent</item>
         <item name="android:windowBackground">@color/white</item>
+        <item name="axis_marks_text_color">@color/text_color</item>
+        <item name="axis_lines_color">@color/line_color</item>
+        <item name="highlight_line_color">@color/highlight_line</item>
+        <item name="badge_background_color">@color/badge_background_light</item>
+        <item name="badge_title_color">@color/dark_grey</item>
+        <item name="window_selector_dim_color">@color/window_selector_dim</item>
+        <item name="window_selector_frame_color">@color/window_selector_frame</item>
+        <item name="line_checkbox_text_color">@color/dark_grey</item>
+        <item name="line_checkbox_divider_color">@color/light_grey</item>
+    </style>
+
+    <style name="AppThemeDark">
+        <item name="android:colorPrimary">@color/colorPrimary_dark</item>
+        <item name="android:colorPrimaryDark">@color/colorPrimaryDark_dark</item>
+        <item name="android:colorAccent">@color/colorAccent</item>
+        <item name="android:windowBackground">@color/window_background</item>
+        <item name="axis_marks_text_color">@color/text_color_dark</item>
+        <item name="axis_lines_color">@color/line_color_dark</item>
+        <item name="highlight_line_color">@color/highlight_line_dark</item>
+        <item name="badge_background_color">@color/badge_background_dark</item>
+        <item name="badge_title_color">@color/badge_title_dark</item>
+        <item name="window_selector_dim_color">@color/window_selector_dim_dark</item>
+        <item name="window_selector_frame_color">@color/window_selector_frame_dark</item>
+        <item name="line_checkbox_text_color">@color/white</item>
+        <item name="line_checkbox_divider_color">@color/divider_dark</item>
     </style>
 
 </resources>
