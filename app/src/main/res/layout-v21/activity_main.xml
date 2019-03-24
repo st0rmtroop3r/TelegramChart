@@ -46,13 +46,6 @@
         android:paddingTop="2dp"
         />
 
-    <LinearLayout
-        android:id="@+id/ll_checkBoxes"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_below="@id/selector" />
-
     <com.st0rmtroop3r.telegramchart.Badge
         android:id="@+id/grid"
         android:visibility="gone"

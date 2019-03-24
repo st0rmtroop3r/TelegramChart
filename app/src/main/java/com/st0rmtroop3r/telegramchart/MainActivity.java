@@ -25,6 +25,7 @@ import android.widget.Spinner;
 import com.st0rmtroop3r.telegramchart.enitity.Chart;
 import com.st0rmtroop3r.telegramchart.enitity.ChartLine;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -36,6 +37,7 @@ public class MainActivity extends Activity {
     int foo = 200;
     private List<Chart> charts;
     private Chart chart;
+    private int selectedChartNumber = 0;
     private float xFrom = 0;
     private float xTo = 1;
     private ReactiveChartView reactiveChartView;
@@ -43,6 +45,10 @@ public class MainActivity extends Activity {
     private ChartWindowSelector chartWindowSelector;
     private int chartRangeMaxValue;
     private static final String PREF_THEME_DARK = "PREF_THEME_DARK";
+    private static final String BUNDLE_CHART_NUMBER = "BUNDLE_CHART_NUMBER";
+    private static final String BUNDLE_X_FROM = "BUNDLE_X_FROM";
+    private static final String BUNDLE_X_TO = "BUNDLE_X_TO";
+    private static final String BUNDLE_OPTED_OUT_LINES = "BUNDLE_OPTED_OUT_LINES";
     private final CheckboxListener checkboxListener = new CheckboxListener();
     private LinearLayout checkboxes;
 
@@ -61,12 +67,42 @@ public class MainActivity extends Activity {
         reactiveChartView.badge = findViewById(R.id.grid);
 //        coordinatesView.setOnClickListener(v -> coordinatesView.setYAxisMaxValue(foo--));
 
+        List<String> ids = null;
+        if (savedInstanceState != null) {
+            selectedChartNumber = savedInstanceState.getInt(BUNDLE_CHART_NUMBER);
+            xFrom = savedInstanceState.getFloat(BUNDLE_X_FROM);
+            xTo = savedInstanceState.getFloat(BUNDLE_X_TO);
+            ids = savedInstanceState.getStringArrayList(BUNDLE_OPTED_OUT_LINES);
+        }
+
         chartWindowSelector.setSelectionListener(this::onSelectedRangeChanged);
 
         charts = DataProvider.readChartsData(getApplicationContext(), R.raw.chart_data);
         setupSpinner();
-        chart = charts.get(0);
+        chart = charts.get(selectedChartNumber);
+        if (ids != null) {
+            for (String id : ids) {
+                for (ChartLine line : chart.chartLines) {
+                    if (id.equals(line.id)) line.visible = false;
+                }
+            }
+        }
         setupChart();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(BUNDLE_CHART_NUMBER, selectedChartNumber);
+        outState.putFloat(BUNDLE_X_FROM, xFrom);
+        outState.putFloat(BUNDLE_X_TO, xTo);
+        ArrayList<String> ids = new ArrayList<>();
+        for (ChartLine chartLine : chart.chartLines) {
+            if (!chartLine.visible) {
+                ids.add(chartLine.id);
+            }
+        }
+        outState.putStringArrayList(BUNDLE_OPTED_OUT_LINES, ids);
     }
 
     private void setupChart() {
@@ -94,7 +130,7 @@ public class MainActivity extends Activity {
             }
             cb.setTag(chartLine);
             checkboxes.addView(cb);
-            cb.setChecked(true);
+            cb.setChecked(chartLine.visible);
             cb.setOnCheckedChangeListener(checkboxListener);
         }
     }
@@ -114,6 +150,7 @@ public class MainActivity extends Activity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 Log.w(TAG, "onItemSelected: "+ position );
+                selectedChartNumber = position;
                 chart = charts.get(position);
                 setupChart();
                 onSelectedRangeChanged(xFrom, xTo);
@@ -135,7 +172,6 @@ public class MainActivity extends Activity {
     }
 
     private void updateYAxisMaxValue() {
-        Log.w(TAG, "updateYAxisMaxValue: " );
 
         int fromDataIndex = (int) (chart.xData.length * xFrom);
         fromDataIndex = fromDataIndex < 0 ? 0 : fromDataIndex;

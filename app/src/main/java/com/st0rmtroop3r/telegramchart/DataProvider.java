@@ -2,7 +2,6 @@ package com.st0rmtroop3r.telegramchart;
 
 import android.content.Context;
 import android.util.JsonReader;
-import android.util.Log;
 import android.util.Pair;
 
 import com.st0rmtroop3r.telegramchart.enitity.Chart;
@@ -110,12 +109,12 @@ public class DataProvider {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        for (Chart chart : charts) {
-            Log.w(TAG, "readChartsData: xData.length " + chart.xData.length);
-            for (ChartLine chartLine : chart.chartLines) {
-                Log.i(TAG, "readChartsData: " + chartLine.id + ", name " + chartLine.name + ", color " + chartLine.color + ", yData.length " + chartLine.yData.length);
-            }
-        }
+//        for (Chart chart : charts) {
+//            Log.w(TAG, "readChartsData: xData.length " + chart.xData.length);
+//            for (ChartLine chartLine : chart.chartLines) {
+//                Log.i(TAG, "readChartsData: " + chartLine.id + ", name " + chartLine.name + ", color " + chartLine.color + ", yData.length " + chartLine.yData.length);
+//            }
+//        }
         return charts;
     }
 

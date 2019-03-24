@@ -54,9 +54,9 @@ public class ChartWindowSelector extends ChartView {
         xAxisLength = chart.xData.length - 1;
         yAxisMaxValue = 0;
         chartLines.clear();
-        for (ChartLine chartLine : chart.chartLines) {
-            ChameleonChartLine chartLineView = new ChameleonChartLine(chartLine.yData,
-                    Color.parseColor(chartLine.color), chartLine.name, chartLine.id);
+        for (ChartLine line : chart.chartLines) {
+            ChameleonChartLine chartLineView = new ChameleonChartLine(line.yData,
+                    Color.parseColor(line.color), line.name, line.id, line.visible);
             chartLines.add(chartLineView);
             if (yAxisMaxValue < chartLineView.yAxisMax) {
                 yAxisMaxValue = chartLineView.yAxisMax;
@@ -314,8 +314,8 @@ public class ChartWindowSelector extends ChartView {
 
         Paint paintSolid;
 
-        ChameleonChartLine(int[] data, int color, String name, String id) {
-            super(data, color, name, id);
+        ChameleonChartLine(int[] data, int color, String name, String id, boolean visible) {
+            super(data, color, name, id, visible);
             paintSolid = new Paint(paint);
             paint.setAlpha((int) (255 * 0.6));
             paintSolid.setAntiAlias(true);

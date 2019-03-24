@@ -9,7 +9,6 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 
 import com.st0rmtroop3r.telegramchart.enitity.Chart;
@@ -98,9 +97,9 @@ public class ChartView extends View {
         xAxisLength = chart.xData.length - 1;
         yAxisMaxValue = 0;
         chartLines.clear();
-        for (ChartLine chartLine : chart.chartLines) {
-            ChartLineView chartLineView = new ChartLineView(chartLine.yData,
-                    Color.parseColor(chartLine.color), chartLine.name, chartLine.id);
+        for (ChartLine line : chart.chartLines) {
+            ChartLineView chartLineView = new ChartLineView(line.yData,
+                    Color.parseColor(line.color), line.name, line.id, line.visible);
             chartLines.add(chartLineView);
             if (yAxisMaxValue < chartLineView.yAxisMax) {
                 yAxisMaxValue = chartLineView.yAxisMax;
@@ -176,12 +175,13 @@ public class ChartView extends View {
         boolean visible = true;
         ChartLineAnimator animator;
 
-        ChartLineView(int[] data, int color, String name, String id) {
+        ChartLineView(int[] data, int color, String name, String id, boolean visible) {
             this.data = data;
             this.name = name;
             this.id = id;
             this.color = color;
-            Log.w(TAG, "ChartLineView: data.length = " + data.length);
+            this.draw = visible;
+            this.visible = visible;
             for (int aData : data) {
                 if (aData > yAxisMax) yAxisMax = aData;
             }
