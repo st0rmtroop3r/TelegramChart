@@ -1,4 +1,4 @@
-package com.st0rmtroop3r.telegramchart;
+package com.st0rmtroop3r.telegramchart.views;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -17,6 +17,8 @@ import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Interpolator;
+
+import com.st0rmtroop3r.telegramchart.R;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -145,9 +147,7 @@ public class CoordinatesView extends View {
         yStartMark.y = baseLine - yMarkPaddingLine;
     }
 
-    void setYAxisMaxValue(int newValue) {
-//        Log.w(TAG, "setYAxisMaxValue: " + newValue + ", yAxisAnimators.size " + yAxisAnimators.size());
-
+    public void setYAxisMaxValue(int newValue) {
         if (newValue == yAxisMaxValue) return;
 
         boolean scrollUp = newValue < yAxisMaxValue;
@@ -170,12 +170,12 @@ public class CoordinatesView extends View {
         currentYAxisAnimator = yAxisAnimator;
     }
 
-    void setXAxisData(long[] xAxisData) {
+    public void setXAxisData(long[] xAxisData) {
         this.xAxisData = xAxisData;
         xAxis.setData(xAxisData);
     }
 
-    void setXAxisDataRange(float from, float to) {
+    public void setXAxisDataRange(float from, float to) {
         xAxisDataRangeFrom = from;
         xAxisDataRangeTo = to;
         xAxis.applyXDataRange();

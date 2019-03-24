@@ -1,4 +1,4 @@
-package com.st0rmtroop3r.telegramchart;
+package com.st0rmtroop3r.telegramchart.views;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -7,6 +7,8 @@ import android.widget.GridLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import com.st0rmtroop3r.telegramchart.R;
 
 public class Badge extends LinearLayout {
 
@@ -41,18 +43,18 @@ public class Badge extends LinearLayout {
         super.setX(x);
     }
 
-    void init(Context context) {
+    private void init(Context context) {
         LayoutInflater.from(context).inflate(R.layout.widget_badge, this);
         setOrientation(VERTICAL);
         txvTitle = findViewById(R.id.txv_badge_title);
         gridLayout = findViewById(R.id.grl_badge_values);
     }
 
-    void setTitle(String newTitle) {
+    public void setTitle(String newTitle) {
         txvTitle.setText(newTitle);
     }
 
-    void addValue(String value, String name, int color) {
+    public void addValue(String value, String name, int color) {
         BadgeItem badgeItem = new BadgeItem(getContext());
         badgeItem.setData(value, name, color);
         if (gridLayout.getChildCount() % 2 == 0) {
@@ -63,7 +65,7 @@ public class Badge extends LinearLayout {
         gridLayout.addView(badgeItem);
     }
 
-    void removeValues() {
+    public void removeValues() {
         gridLayout.removeAllViews();
     }
 }

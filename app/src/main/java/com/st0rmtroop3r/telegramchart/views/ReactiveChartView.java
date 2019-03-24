@@ -1,4 +1,4 @@
-package com.st0rmtroop3r.telegramchart;
+package com.st0rmtroop3r.telegramchart.views;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -10,6 +10,7 @@ import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.MotionEvent;
 
+import com.st0rmtroop3r.telegramchart.R;
 import com.st0rmtroop3r.telegramchart.enitity.Chart;
 import com.st0rmtroop3r.telegramchart.enitity.ChartLine;
 
@@ -30,7 +31,7 @@ public class ReactiveChartView extends ChartView {
     private final float circleInnerRadius = 15f;
     private int currentHighlightIndex = -1;
     private long[] xData;
-    Badge badge;
+    private Badge badge;
 
     public ReactiveChartView(Context context) {
         super(context);
@@ -102,7 +103,7 @@ public class ReactiveChartView extends ChartView {
     }
 
     @Override
-    void setChartsData(Chart newChart) {
+    public void setChartsData(Chart newChart) {
         super.setChartsData(newChart);
         xData = newChart.xData;
         circles.clear();
@@ -112,11 +113,15 @@ public class ReactiveChartView extends ChartView {
     }
 
     @Override
-    void setLineVisible(String lineId, boolean visible) {
+    public void setLineVisible(String lineId, boolean visible) {
         super.setLineVisible(lineId, visible);
         for (Circle circle : circles) {
             if (circle.id.equals(lineId)) circle.visible = visible;
         }
+    }
+
+    public void setBadge(Badge badge) {
+        this.badge = badge;
     }
 
     private void onActionDown(float x) {

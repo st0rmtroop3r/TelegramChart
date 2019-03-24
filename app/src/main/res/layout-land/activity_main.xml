@@ -8,35 +8,28 @@
         android:id="@+id/spn_chart_selector"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="16dp"
         android:layout_alignParentTop="true"
-        android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true" />
 
-    <com.st0rmtroop3r.telegramchart.CoordinatesView
+    <com.st0rmtroop3r.telegramchart.views.CoordinatesView
         android:id="@+id/coordinates"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:paddingTop="30dp"
         android:paddingBottom="@dimen/coordinates_bottom_padding"
         android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_toLeftOf="@id/spn_chart_selector"
         android:layout_toStartOf="@id/spn_chart_selector"
-        android:layout_above="@+id/selector"
-        />
+        android:layout_above="@+id/selector" />
 
-    <com.st0rmtroop3r.telegramchart.ReactiveChartView
+    <com.st0rmtroop3r.telegramchart.views.ReactiveChartView
         android:id="@+id/reactive"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_toLeftOf="@id/spn_chart_selector"
         android:layout_toStartOf="@id/spn_chart_selector"
         android:layout_above="@+id/selector"
         android:paddingTop="30dp"
@@ -45,14 +38,12 @@
         android:paddingRight="@dimen/margin_horizontal"
         android:paddingEnd="@dimen/margin_horizontal" />
 
-    <com.st0rmtroop3r.telegramchart.ChartWindowSelector
+    <com.st0rmtroop3r.telegramchart.views.ChartWindowSelector
         android:id="@+id/selector"
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentBottom="true"
-        android:layout_alignRight="@+id/coordinates"
         android:layout_alignEnd="@id/coordinates"
         android:layout_marginTop="16dp"
         android:layout_marginBottom="16dp"
@@ -60,16 +51,15 @@
         android:layout_marginStart="@dimen/margin_horizontal"
         android:layout_marginRight="@dimen/margin_horizontal"
         android:layout_marginEnd="@dimen/margin_horizontal"
-        android:paddingTop="2dp"
-        />
+        android:paddingTop="2dp" />
 
-    <com.st0rmtroop3r.telegramchart.Badge
+    <com.st0rmtroop3r.telegramchart.views.Badge
         android:id="@+id/grid"
         android:visibility="gone"
         android:elevation="2dp"
         android:layout_marginTop="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginLeft="-16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="-16dp"
         android:paddingTop="8dp"
         android:paddingBottom="8dp"
         android:paddingLeft="16dp"
@@ -82,9 +72,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/spn_chart_selector"
-        android:layout_toRightOf="@+id/coordinates"
-        android:layout_toEndOf="@id/coordinates"
-        >
+        android:layout_toEndOf="@id/coordinates">
 
         <LinearLayout
             android:id="@+id/ll_checkboxes"
@@ -92,8 +80,7 @@
             android:layout_height="wrap_content"
             android:divider="@drawable/divider"
             android:showDividers="middle"
-            android:orientation="vertical"
-            />
+            android:orientation="vertical" />
 
     </ScrollView>
 

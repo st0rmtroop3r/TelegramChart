@@ -1,10 +1,12 @@
-package com.st0rmtroop3r.telegramchart;
+package com.st0rmtroop3r.telegramchart.views;
 
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.st0rmtroop3r.telegramchart.R;
 
 public class BadgeItem extends LinearLayout {
 
@@ -26,14 +28,14 @@ public class BadgeItem extends LinearLayout {
         init(context);
     }
 
-    void init(Context context) {
+    private void init(Context context) {
         LayoutInflater.from(context).inflate(R.layout.widget_badge_item, this);
         setOrientation(VERTICAL);
         txvChartValue = findViewById(R.id.txv_chart_line_value);
         txvChartName = findViewById(R.id.txv_chart_line_name);
     }
 
-    void setData(String value, String name, int color) {
+    public void setData(String value, String name, int color) {
         txvChartValue.setTextColor(color);
         txvChartValue.setText(value);
         txvChartName.setTextColor(color);

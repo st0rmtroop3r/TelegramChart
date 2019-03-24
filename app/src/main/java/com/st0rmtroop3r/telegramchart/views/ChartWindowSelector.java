@@ -1,4 +1,4 @@
-package com.st0rmtroop3r.telegramchart;
+package com.st0rmtroop3r.telegramchart.views;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -10,6 +10,7 @@ import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.MotionEvent;
 
+import com.st0rmtroop3r.telegramchart.R;
 import com.st0rmtroop3r.telegramchart.enitity.Chart;
 import com.st0rmtroop3r.telegramchart.enitity.ChartLine;
 
@@ -50,7 +51,7 @@ public class ChartWindowSelector extends ChartView {
     }
 
     @Override
-    void setChartsData(Chart chart) {
+    public void setChartsData(Chart chart) {
         xAxisLength = chart.xData.length - 1;
         yAxisMaxValue = 0;
         chartLines.clear();
@@ -329,7 +330,7 @@ public class ChartWindowSelector extends ChartView {
         NONE
     }
 
-    interface SelectionListener {
+    public interface SelectionListener {
         void onChange(float left, float right);
     }
 

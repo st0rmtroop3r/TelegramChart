@@ -1,4 +1,4 @@
-package com.st0rmtroop3r.telegramchart;
+package com.st0rmtroop3r.telegramchart.views;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -75,7 +75,7 @@ public class ChartView extends View {
         updateView();
     }
 
-    void setYAxisMaxValue(int newValue) {
+    public void setYAxisMaxValue(int newValue) {
         if (newValue == targetYAxisMaxValue) return;
         targetYAxisMaxValue = newValue;
         int oldValue = yAxisMaxValue;
@@ -94,7 +94,7 @@ public class ChartView extends View {
         yAxisMaxValueAnimator.start();
     }
 
-    void setChartsData(Chart chart) {
+    public void setChartsData(Chart chart) {
         xAxisLength = chart.xData.length - 1;
         yAxisMaxValue = 0;
         chartLines.clear();
@@ -113,18 +113,22 @@ public class ChartView extends View {
         }
     }
 
-    void setZoomRange(float fromPercent, float toPercent) {
+    public void setZoomRange(float fromPercent, float toPercent) {
         xFrom = fromPercent;
         xTo = toPercent;
         updateView();
     }
 
-    void setLineVisible(String lineId, boolean visible) {
+    public void setLineVisible(String lineId, boolean visible) {
         for (ChartLineView line : chartLines) {
             if (line.id.equals(lineId)) {
                 line.setVisible(visible);
             }
         }
+    }
+
+    public ArrayList<ChartLineView> getChartLines() {
+        return chartLines;
     }
 
     protected void updateView() {
@@ -161,7 +165,7 @@ public class ChartView extends View {
         }
     }
 
-    class ChartLineView {
+    public class ChartLineView {
 
         Path path = new Path();
         Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -201,6 +205,14 @@ public class ChartView extends View {
             } else {
                 animator.hideChartLine();
             }
+        }
+
+        public boolean isVisible() {
+            return visible;
+        }
+
+        public int getYAxisMax() {
+            return  yAxisMax;
         }
     }
 
