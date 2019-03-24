@@ -25,6 +25,7 @@ public class ChartView extends View {
     protected int targetYAxisMaxValue = 0;
     protected int xAxisLength = 0;
     protected float xInterval = 0;
+    protected float yInterval = 0;
     protected int viewWidth = 0;
     protected int viewHeight = 0;
     protected float xFrom = 0;
@@ -130,33 +131,31 @@ public class ChartView extends View {
         float range = xTo - xFrom;
         totalScaledWidth = viewWidth / range;
         xInterval = (totalScaledWidth - totalXPadding) / xAxisLength;
+        yInterval = (float) (viewHeight - paddingBottom - paddingTop) / yAxisMaxValue;
         xOffset = -totalScaledWidth * xFrom;
 
-        int fromDataIndex = (int) (xAxisLength * xFrom);
-        fromDataIndex = fromDataIndex > 0 ? fromDataIndex - 1 : 0;
+        int fromDataIndex = (int) (xAxisLength * xFrom - leftPadding / xInterval);
+        fromDataIndex = fromDataIndex < 0 ? 0 : fromDataIndex;
 
-        float dataFromX = fromDataIndex * xInterval + xOffset + leftPadding;
+        float dataFromX = xOffset + leftPadding + fromDataIndex * xInterval;
 
         setupChartsPath(dataFromX, fromDataIndex);
-
         invalidate();
     }
 
     private void setupChartsPath(float dataFromX, int fromDataIndex) {
 
         for (ChartLineView chart : chartLines) {
-            chart.heightInterval = (float) (viewHeight - paddingBottom - paddingTop) / yAxisMaxValue;
             chart.path.reset();
-            chart.path.moveTo(dataFromX, viewHeight - paddingBottom - chart.heightInterval * chart.data[fromDataIndex]);
+            chart.path.moveTo(dataFromX, viewHeight - paddingBottom - yInterval * chart.data[fromDataIndex]);
         }
 
         for (int i = 1; dataFromX + xInterval * i < viewWidth + xInterval; i++) {
 
             for (ChartLineView chart : chartLines) {
-                try {
-                    chart.path.lineTo(dataFromX + xInterval * i,
-                            viewHeight - paddingBottom - chart.heightInterval * chart.data[fromDataIndex + i]);
-                } catch (ArrayIndexOutOfBoundsException e) {}
+                if (fromDataIndex + i > xAxisLength) return;
+                float y = viewHeight - paddingBottom - yInterval * chart.data[fromDataIndex + i];
+                chart.path.lineTo(dataFromX + xInterval * i, y);
             }
         }
     }
@@ -170,9 +169,8 @@ public class ChartView extends View {
         String id;
         int color;
         int yAxisMax = 0;
-        float heightInterval;
-        boolean draw = true;
-        boolean visible = true;
+        boolean draw;
+        boolean visible;
         ChartLineAnimator animator;
 
         ChartLineView(int[] data, int color, String name, String id, boolean visible) {

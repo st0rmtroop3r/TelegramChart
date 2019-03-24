@@ -153,7 +153,7 @@ public class ReactiveChartView extends ChartView {
         for (int i = 0; i < chartLines.size(); i++) {
             ChartLineView chart = chartLines.get(i);
             if (!chart.visible) continue;
-            circles.get(i).setCoordinates(xCoordinate, viewHeight - chart.heightInterval * chart.data[dataIndex]);
+            circles.get(i).setCoordinates(xCoordinate, viewHeight - yInterval * chart.data[dataIndex]);
             badge.addValue("" + chart.data[dataIndex], chart.name, chart.paint.getColor());
         }
 

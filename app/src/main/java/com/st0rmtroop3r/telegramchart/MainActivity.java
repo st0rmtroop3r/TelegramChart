@@ -32,25 +32,24 @@ import java.util.List;
 public class MainActivity extends Activity {
 
     private static final String TAG = MainActivity.class.getSimpleName();
-
-    boolean clickFlag;
-    int foo = 200;
-    private List<Chart> charts;
-    private Chart chart;
-    private int selectedChartNumber = 0;
-    private float xFrom = 0;
-    private float xTo = 1;
-    private ReactiveChartView reactiveChartView;
-    private CoordinatesView coordinatesView;
-    private ChartWindowSelector chartWindowSelector;
-    private int chartRangeMaxValue;
     private static final String PREF_THEME_DARK = "PREF_THEME_DARK";
     private static final String BUNDLE_CHART_NUMBER = "BUNDLE_CHART_NUMBER";
     private static final String BUNDLE_X_FROM = "BUNDLE_X_FROM";
     private static final String BUNDLE_X_TO = "BUNDLE_X_TO";
     private static final String BUNDLE_OPTED_OUT_LINES = "BUNDLE_OPTED_OUT_LINES";
-    private final CheckboxListener checkboxListener = new CheckboxListener();
+
+    private ReactiveChartView reactiveChartView;
+    private CoordinatesView coordinatesView;
+    private ChartWindowSelector chartWindowSelector;
     private LinearLayout checkboxes;
+    private final CheckboxListener checkboxListener = new CheckboxListener();
+
+    private List<Chart> charts;
+    private Chart chart;
+    private int selectedChartNumber = 0;
+    private float xFrom = 0;
+    private float xTo = 1;
+    private int chartRangeMaxValue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
