@@ -10,5 +10,6 @@
     <attr name="window_selector_frame_color" format="color|reference" />
     <attr name="line_checkbox_text_color" format="color|reference" />
     <attr name="line_checkbox_divider_color" format="color|reference" />
+    <attr name="chart_title_color" format="color|reference" />
 
 </resources>

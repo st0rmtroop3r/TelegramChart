@@ -18,7 +18,8 @@
         <item name="window_selector_dim_color">@color/window_selector_dim</item>
         <item name="window_selector_frame_color">@color/window_selector_frame</item>
         <item name="line_checkbox_text_color">@color/dark_grey</item>
-        <item name="line_checkbox_divider_color">@color/light_grey</item>
+        <item name="line_checkbox_divider_color">@color/divider_light</item>
+        <item name="chart_title_color">@color/chart_title_light</item>
     </style>
 
     <style name="AppThemeDark">
@@ -35,6 +36,7 @@
         <item name="window_selector_frame_color">@color/window_selector_frame_dark</item>
         <item name="line_checkbox_text_color">@color/white</item>
         <item name="line_checkbox_divider_color">@color/divider_dark</item>
+        <item name="chart_title_color">@color/chart_title_dark</item>
     </style>
 
 </resources>

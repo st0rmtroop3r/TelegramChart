@@ -32,6 +32,7 @@ public class CoordinatesView extends View {
     private int paddingTop = 150;
     private int paddingBottom = 100;
     private int yMarkPaddingLine = 20;
+    private int xMarksMarginBaseLine;
     private int lineInterval;
     private int baseLine;
 
@@ -122,6 +123,8 @@ public class CoordinatesView extends View {
         xAxisLinePaint.setStyle(Paint.Style.STROKE);
         xAxisLinePaint.setStrokeCap(Paint.Cap.ROUND);
         xAxisLinePaint.setStrokeWidth(resources.getDimension(R.dimen.x_axis_line_width));
+
+        xMarksMarginBaseLine = resources.getDimensionPixelSize(R.dimen.coord_x_marks_margin_x_axis);
 
         yStartMark.text = "0";
 
@@ -228,12 +231,12 @@ public class CoordinatesView extends View {
             if (xAxisData == null || viewWidth == 0) return;
 
             int xPadding = 50;
-            int totalChartWidth = (int) ((viewWidth) / (xAxisDataRangeTo - xAxisDataRangeFrom));// + xPadding * 2;
+            int totalChartWidth = (int) ((viewWidth) / (xAxisDataRangeTo - xAxisDataRangeFrom));
 
             float numberOfMarksChartCanFit = (totalChartWidth - markWidth) / markWidth;
 
             for (int i = 0; i < xMarks.length; i++) {
-                xMarks[i].y = baseLine + 80;
+                xMarks[i].y = (int) (baseLine + xMarksMarginBaseLine + textPaint.getTextSize());
                 xMarks[i].x = (int) ((totalChartWidth - xPadding - markWidth * 0.1) / xMarks.length * i - totalChartWidth * xAxisDataRangeFrom) + xPadding;
             }
 

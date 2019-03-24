@@ -29,8 +29,8 @@ public class BadgeItem extends LinearLayout {
     void init(Context context) {
         LayoutInflater.from(context).inflate(R.layout.widget_badge_item, this);
         setOrientation(VERTICAL);
-        txvChartValue = findViewById(R.id.txv_chart_value);
-        txvChartName = findViewById(R.id.txv_chart_name);
+        txvChartValue = findViewById(R.id.txv_chart_line_value);
+        txvChartName = findViewById(R.id.txv_chart_line_name);
     }
 
     void setData(String value, String name, int color) {

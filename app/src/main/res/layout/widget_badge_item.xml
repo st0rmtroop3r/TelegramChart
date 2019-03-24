@@ -7,13 +7,13 @@
     tools:parentTag="android.widget.LinearLayout">
 
     <TextView
-        android:id="@+id/txv_chart_value"
+        android:id="@+id/txv_chart_line_value"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="18sp" />
 
     <TextView
-        android:id="@+id/txv_chart_name"
+        android:id="@+id/txv_chart_line_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 

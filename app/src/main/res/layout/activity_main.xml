@@ -4,19 +4,31 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <TextView
+        android:id="@+id/txv_chart_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="16dp"
+        android:textStyle="bold"
+        android:text="@string/chart_name"
+        android:textSize="15sp"
+        android:textColor="?attr/chart_title_color" />
+
     <com.st0rmtroop3r.telegramchart.CoordinatesView
         android:id="@+id/coordinates"
         android:layout_width="match_parent"
         android:layout_height="@dimen/coordinates_height"
-        android:paddingTop="@dimen/coordinates_x_padding"
-        android:paddingBottom="30dp"
-        android:layout_alignParentTop="true" />
+        android:paddingTop="30dp"
+        android:paddingBottom="@dimen/coordinates_x_padding"
+        android:layout_below="@id/txv_chart_title" />
 
     <com.st0rmtroop3r.telegramchart.ReactiveChartView
         android:id="@+id/reactive"
         android:layout_width="match_parent"
         android:layout_height="@dimen/chart_height"
-        android:layout_alignParentTop="true"
+        android:layout_below="@id/txv_chart_title"
         android:paddingTop="@dimen/coordinates_x_padding"
         android:paddingLeft="@dimen/margin_horizontal"
         android:paddingStart="@dimen/margin_horizontal"
@@ -26,7 +38,7 @@
     <com.st0rmtroop3r.telegramchart.ChartWindowSelector
         android:id="@+id/selector"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="40dp"
         android:layout_below="@id/coordinates"
         android:layout_marginTop="16dp"
         android:layout_marginBottom="16dp"
