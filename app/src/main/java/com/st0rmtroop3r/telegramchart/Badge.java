@@ -34,7 +34,7 @@ public class Badge extends LinearLayout {
         int leftMargin = ((RelativeLayout.LayoutParams)getLayoutParams()).leftMargin;
         int rightMargin = ((RelativeLayout.LayoutParams)getLayoutParams()).rightMargin;
         if (getWidth() + leftMargin + rightMargin > chartWidth - x) {
-            x = (int) (x - getWidth() - rightMargin);
+            x = (int) (x - getWidth() + rightMargin);
         } else {
             x = x + leftMargin;
         }

@@ -79,7 +79,8 @@ public class ReactiveChartView extends ChartView {
         canvas.drawPath(linePath, linePaint);
 
         for (int i = circles.size() - 1; i >= 0; i--) {
-            circles.get(i).draw(canvas);
+            Circle c = circles.get(i);
+            if (c.visible) c.draw(canvas);
         }
     }
 
@@ -106,7 +107,15 @@ public class ReactiveChartView extends ChartView {
         xData = newChart.xData;
         circles.clear();
         for (ChartLine chartLine : newChart.chartLines) {
-            circles.add(new Circle(Color.parseColor(chartLine.color)));
+            circles.add(new Circle(Color.parseColor(chartLine.color), chartLine.id, chartLine.visible));
+        }
+    }
+
+    @Override
+    void setLineVisible(String lineId, boolean visible) {
+        super.setLineVisible(lineId, visible);
+        for (Circle circle : circles) {
+            if (circle.id.equals(lineId)) circle.visible = visible;
         }
     }
 
@@ -143,6 +152,7 @@ public class ReactiveChartView extends ChartView {
         badge.removeValues();
         for (int i = 0; i < chartLines.size(); i++) {
             ChartLineView chart = chartLines.get(i);
+            if (!chart.visible) continue;
             circles.get(i).setCoordinates(xCoordinate, viewHeight - chart.heightInterval * chart.data[dataIndex]);
             badge.addValue("" + chart.data[dataIndex], chart.name, chart.paint.getColor());
         }
@@ -171,14 +181,18 @@ public class ReactiveChartView extends ChartView {
     }
 
     private class Circle {
+        String id;
+        boolean visible;
         Path outer = new Path();
         Path inner = new Path();
         Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
-        Circle(int color) {
+        Circle(int color, String id, boolean visible) {
             paint.setColor(color);
             paint.setStyle(Paint.Style.FILL);
             paint.setStrokeWidth(5f);
+            this.id = id;
+            this.visible = visible;
         }
 
         void setCoordinates(float x, float y) {
