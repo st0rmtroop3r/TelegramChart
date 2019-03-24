@@ -9,18 +9,22 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.Pair;
+import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 
 import com.st0rmtroop3r.telegramchart.enitity.Chart;
 import com.st0rmtroop3r.telegramchart.enitity.ChartLine;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -32,82 +36,53 @@ public class MainActivity extends Activity {
     int foo = 200;
     private List<Chart> charts;
     private Chart chart;
-    float xFrom = 0;
-    float xTo = 1;
+    private float xFrom = 0;
+    private float xTo = 1;
     private ReactiveChartView reactiveChartView;
     private CoordinatesView coordinatesView;
     private ChartWindowSelector chartWindowSelector;
     private int chartRangeMaxValue;
     private static final String PREF_THEME_DARK = "PREF_THEME_DARK";
+    private final CheckboxListener checkboxListener = new CheckboxListener();
+    private LinearLayout checkboxes;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         boolean dark = PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
                 .getBoolean(PREF_THEME_DARK, false);
         setTheme(dark ? R.style.AppThemeDark : R.style.AppTheme);
-
         super.onCreate(savedInstanceState);
-
-        mainActivity();
-
-    }
-
-    private void mainActivity() {
         setContentView(R.layout.activity_main);
-
-        charts = DataProvider.readChartsData(getApplicationContext(), R.raw.chart_data);
 
         reactiveChartView = findViewById(R.id.reactive);
         chartWindowSelector = findViewById(R.id.selector);
         coordinatesView = findViewById(R.id.coordinates);
-        LinearLayout checkboxes = findViewById(R.id.ll_checkboxes);
-
+        checkboxes = findViewById(R.id.ll_checkboxes);
         reactiveChartView.badge = findViewById(R.id.grid);
+//        coordinatesView.setOnClickListener(v -> coordinatesView.setYAxisMaxValue(foo--));
 
-        Pair<int[], String> y0pair = DataProvider.getY0Data();
-        Pair<int[], String> y1pair = DataProvider.getY1Data();
+        chartWindowSelector.setSelectionListener(this::onSelectedRangeChanged);
 
-        List<Pair<int[], Integer>> list = new ArrayList<>();
-        list.add(new Pair<>(y0pair.first, Color.parseColor(y0pair.second)));
-        list.add(new Pair<>(y1pair.first, Color.parseColor(y1pair.second)));
-
+        charts = DataProvider.readChartsData(getApplicationContext(), R.raw.chart_data);
+        setupSpinner();
         chart = charts.get(0);
+        setupChart();
+    }
 
-
-
+    private void setupChart() {
+//        Log.w(TAG, "setupChart: " );
         chartWindowSelector.setChartsData(chart);
         reactiveChartView.setChartsData(chart);
-        chartWindowSelector.setSelectionListener((left, right) -> {
-            xFrom = left;
-            xTo = right;
-            updateYAxisMaxValue();
-            int yAxisMax = chartRangeMaxValue / 5 * 5;
-            reactiveChartView.setYAxisMaxValue(yAxisMax);
-            reactiveChartView.setZoomRange(xFrom, xTo);
-            coordinatesView.setXAxisDataRange(xFrom, xTo);
-            coordinatesView.setYAxisMaxValue(yAxisMax);
-        });
-
-//        coordinatesView.setOnClickListener(v -> coordinatesView.setYAxisMaxValue((int) (Math.random() * 100 + 100)));
-        coordinatesView.setOnClickListener(v -> coordinatesView.setYAxisMaxValue(foo--));
         coordinatesView.setXAxisData(chart.xData);
+        setupCheckboxes();
+    }
 
-//        coordinatesView.setXAxisDataRange(.34f, .78f);
-
-//        coordinatesView.setOnClickListener(v -> {
-//            if (!clickFlag) {
-//                coordinatesView.setYAxisMaxValue(foo++);
-//            } else {
-//                coordinatesView.setYAxisMaxValue(foo--);
-//            }
-//            clickFlag = !clickFlag;
-//        });
-
-        CheckboxListener checkboxListener = new CheckboxListener();
+    private void setupCheckboxes() {
+//        Log.w(TAG, "setupCheckboxes: " );
+        checkboxes.removeAllViews();
 
         for (ChartLine chartLine : chart.chartLines) {
-            CheckBox cb = (CheckBox) LayoutInflater.from(this).inflate(R.layout.chart_checkbox, checkboxes, false);
+            CheckBox cb = (CheckBox) LayoutInflater.from(this).inflate(R.layout.widget_chart_checkbox, checkboxes, false);
             cb.setText(chartLine.name);
 
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
@@ -122,10 +97,45 @@ public class MainActivity extends Activity {
             cb.setChecked(true);
             cb.setOnCheckedChangeListener(checkboxListener);
         }
-
     }
 
-    void updateYAxisMaxValue() {
+    private void setupSpinner() {
+//        Log.w(TAG, "setupSpinner: " );
+        Spinner spinner = findViewById(R.id.spn_chart_selector);
+        TypedValue typedValue = new TypedValue();
+        getTheme().resolveAttribute(R.attr.chart_title_color, typedValue, true);
+        spinner.getBackground().setColorFilter(typedValue.data, PorterDuff.Mode.MULTIPLY);
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this, R.layout.widget_spinner_item);
+        spinner.setAdapter(arrayAdapter);
+        for (int i = 0; i < charts.size(); i++) {
+            arrayAdapter.add(getResources().getString(R.string.chart_name, i));
+        }
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Log.w(TAG, "onItemSelected: "+ position );
+                chart = charts.get(position);
+                setupChart();
+                onSelectedRangeChanged(xFrom, xTo);
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
+    }
+
+    private void onSelectedRangeChanged(float left, float right) {
+        xFrom = left;
+        xTo = right;
+        updateYAxisMaxValue();
+        int yAxisMax = chartRangeMaxValue / 5 * 5;
+        reactiveChartView.setYAxisMaxValue(yAxisMax);
+        reactiveChartView.setZoomRange(xFrom, xTo);
+        coordinatesView.setXAxisDataRange(xFrom, xTo);
+        coordinatesView.setYAxisMaxValue(yAxisMax);
+    }
+
+    private void updateYAxisMaxValue() {
+        Log.w(TAG, "updateYAxisMaxValue: " );
 
         int fromDataIndex = (int) (chart.xData.length * xFrom);
         fromDataIndex = fromDataIndex < 0 ? 0 : fromDataIndex;
@@ -141,30 +151,6 @@ public class MainActivity extends Activity {
                     chartRangeMaxValue = chartLine.yData[i];
                 }
             }
-        }
-    }
-
-    class CheckboxListener implements CompoundButton.OnCheckedChangeListener {
-
-        @Override
-        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-            ChartLine chartLine = (ChartLine) buttonView.getTag();
-            chartLine.visible = isChecked;
-            updateYAxisMaxValue();
-            int yAxisMax = chartRangeMaxValue / 5 * 5;
-
-            reactiveChartView.setLineVisible(chartLine.id, isChecked);
-            chartWindowSelector.setLineVisible(chartLine.id, isChecked);
-            int chartWindowSelectorMax = 0;
-            for (ChartView.ChartLineView chartLineView : chartWindowSelector.chartLines) {
-                if (!chartLineView.visible) continue;
-                if (chartLineView.yAxisMax > chartWindowSelectorMax) {
-                    chartWindowSelectorMax = chartLineView.yAxisMax;
-                }
-            }
-            chartWindowSelector.setYAxisMaxValue(chartWindowSelectorMax);
-            reactiveChartView.setYAxisMaxValue(yAxisMax);
-            coordinatesView.setYAxisMaxValue(yAxisMax);
         }
     }
 
@@ -191,5 +177,29 @@ public class MainActivity extends Activity {
                 .putBoolean(PREF_THEME_DARK, !dark)
                 .commit();
         recreate();
+    }
+
+    private class CheckboxListener implements CompoundButton.OnCheckedChangeListener {
+
+        @Override
+        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+            ChartLine chartLine = (ChartLine) buttonView.getTag();
+            chartLine.visible = isChecked;
+            updateYAxisMaxValue();
+            int yAxisMax = chartRangeMaxValue / 5 * 5;
+
+            reactiveChartView.setLineVisible(chartLine.id, isChecked);
+            chartWindowSelector.setLineVisible(chartLine.id, isChecked);
+            int chartWindowSelectorMax = 0;
+            for (ChartView.ChartLineView chartLineView : chartWindowSelector.chartLines) {
+                if (!chartLineView.visible) continue;
+                if (chartLineView.yAxisMax > chartWindowSelectorMax) {
+                    chartWindowSelectorMax = chartLineView.yAxisMax;
+                }
+            }
+            chartWindowSelector.setYAxisMaxValue(chartWindowSelectorMax);
+            reactiveChartView.setYAxisMaxValue(yAxisMax);
+            coordinatesView.setYAxisMaxValue(yAxisMax);
+        }
     }
 }
