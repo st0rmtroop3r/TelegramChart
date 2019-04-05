@@ -5,7 +5,6 @@ import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Path;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.MotionEvent;
@@ -23,15 +22,15 @@ public class ReactiveChartView extends ChartView {
 
     private static final String TAG = ReactiveChartView.class.getSimpleName();
 
-    private final Path linePath = new Path();
-    private final Paint linePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private XAxisGridLine line = new XAxisGridLine();
     private final Paint innerCirclePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final List<Circle> circles = new ArrayList<>();
-    private final float circleOuterRadius = 25f;
+    private final float circleOuterRadius = 25f;//!!
     private final float circleInnerRadius = 15f;
     private int currentHighlightIndex = -1;
     private long[] xData;
     private Badge badge;
+    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEE, MMM dd");
 
     public ReactiveChartView(Context context) {
         super(context);
@@ -54,11 +53,10 @@ public class ReactiveChartView extends ChartView {
         TypedValue typedValue = new TypedValue();
 
         theme.resolveAttribute(R.attr.highlight_line_color, typedValue, true);
-        linePaint.setColor(typedValue.data);
-        linePaint.setStyle(Paint.Style.STROKE);
-        linePaint.setStrokeJoin(Paint.Join.ROUND);
-        linePaint.setStrokeCap(Paint.Cap.ROUND);
-        linePaint.setStrokeWidth(resources.getDimension(R.dimen.highlight_line));
+        line.paint.setColor(typedValue.data);
+        line.paint.setStyle(Paint.Style.STROKE);
+        line.paint.setStrokeWidth(resources.getDimension(R.dimen.highlight_line));
+        line.y0 = 0f;
 
         theme.resolveAttribute(android.R.attr.windowBackground, typedValue, true);
         innerCirclePaint.setColor(typedValue.data);
@@ -71,17 +69,18 @@ public class ReactiveChartView extends ChartView {
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
         badge.chartWidth = viewWidth;
+        line.y1 = viewHeight;
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        canvas.drawPath(linePath, linePaint);
+        line.draw(canvas);
 
         for (int i = circles.size() - 1; i >= 0; i--) {
             Circle c = circles.get(i);
-            if (c.visible) c.draw(canvas);
+            if (c.isLineVisible) c.draw(canvas);
         }
     }
 
@@ -116,7 +115,7 @@ public class ReactiveChartView extends ChartView {
     public void setLineVisible(String lineId, boolean visible) {
         super.setLineVisible(lineId, visible);
         for (Circle circle : circles) {
-            if (circle.id.equals(lineId)) circle.visible = visible;
+            if (circle.id.equals(lineId)) circle.isLineVisible = visible;
         }
     }
 
@@ -151,27 +150,29 @@ public class ReactiveChartView extends ChartView {
 
     private void setupHighlightPaths(int dataIndex) {
         float xCoordinate = getDataIndexXCoordinate(dataIndex);
-        linePath.moveTo(xCoordinate, 0f);
-        linePath.lineTo(xCoordinate, viewHeight);
+
+        line.x = xCoordinate;
+        line.isShowing = true;
 
         badge.removeValues();
         for (int i = 0; i < chartLines.size(); i++) {
             ChartLineView chart = chartLines.get(i);
             if (!chart.visible) continue;
             circles.get(i).setCoordinates(xCoordinate, viewHeight - yInterval * chart.data[dataIndex]);
+            circles.get(i).isShowing = true;
             badge.addValue("" + chart.data[dataIndex], chart.name, chart.paint.getColor());
         }
 
-        badge.setTitle(new SimpleDateFormat("EEE, MMM dd").format(new Date(xData[dataIndex])));
+        badge.setTitle(simpleDateFormat.format(new Date(xData[dataIndex])));
         badge.setX(xCoordinate);
         badge.setVisibility(VISIBLE);
         currentHighlightIndex = dataIndex;
     }
 
     private void resetHighlightPaths() {
-        linePath.reset();
+        line.isShowing = false;
         for (Circle circle : circles) {
-            circle.reset();
+            circle.isShowing = false;
         }
     }
 
@@ -185,34 +186,45 @@ public class ReactiveChartView extends ChartView {
         return leftPadding + xInterval * dataIndex + xOffset;
     }
 
+    private class XAxisGridLine {
+
+        private final Paint paint = new Paint();
+        float x;
+        float y0;
+        float y1;
+        boolean isShowing = false;
+
+        void draw(Canvas canvas) {
+            if (isShowing) canvas.drawLine(x, y0, x, y1, paint);
+        }
+    }
+
     private class Circle {
         String id;
-        boolean visible;
-        Path outer = new Path();
-        Path inner = new Path();
-        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        boolean isLineVisible;
+        boolean isShowing = false;
+        float x;
+        float y;
+        Paint paint = new Paint();
 
         Circle(int color, String id, boolean visible) {
             paint.setColor(color);
             paint.setStyle(Paint.Style.FILL);
             paint.setStrokeWidth(5f);
             this.id = id;
-            this.visible = visible;
+            this.isLineVisible = visible;
         }
 
-        void setCoordinates(float x, float y) {
-            outer.addCircle(x, y, circleOuterRadius, Path.Direction.CW);
-            inner.addCircle(x, y, circleInnerRadius, Path.Direction.CW);
+        void setCoordinates(float cx, float cy) {
+            x = cx;
+            y = cy;
         }
 
         void draw(Canvas canvas) {
-            canvas.drawPath(outer, paint);
-            canvas.drawPath(inner, innerCirclePaint);
-        }
-
-        void reset() {
-            outer.reset();
-            inner.reset();
+            if (isShowing) {
+                canvas.drawCircle(x, y, circleOuterRadius, paint);
+                canvas.drawCircle(x, y, circleInnerRadius, innerCirclePaint);
+            }
         }
     }
 }
