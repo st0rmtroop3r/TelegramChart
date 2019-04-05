@@ -14,5 +14,7 @@
     <dimen name="selector_window_default_width">120dp</dimen>
     <dimen name="selector_window_min_width">100dp</dimen>
     <dimen name="selector_window_frame_width">6dp</dimen>
+    <dimen name="chart_line_circle_outer_radius">6dp</dimen>
+    <dimen name="chart_line_circle_inner_radius">4dp</dimen>
 
 </resources>

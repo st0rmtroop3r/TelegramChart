@@ -25,8 +25,8 @@ public class ReactiveChartView extends ChartView {
     private XAxisGridLine line = new XAxisGridLine();
     private final Paint innerCirclePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final List<Circle> circles = new ArrayList<>();
-    private final float circleOuterRadius = 25f;//!!
-    private final float circleInnerRadius = 15f;
+    private float circleOuterRadius = 25f;
+    private float circleInnerRadius = 15f;
     private int currentHighlightIndex = -1;
     private long[] xData;
     private Badge badge;
@@ -61,6 +61,9 @@ public class ReactiveChartView extends ChartView {
         theme.resolveAttribute(android.R.attr.windowBackground, typedValue, true);
         innerCirclePaint.setColor(typedValue.data);
         innerCirclePaint.setStyle(Paint.Style.FILL);
+
+        circleOuterRadius = resources.getDimension(R.dimen.chart_line_circle_outer_radius);
+        circleInnerRadius = resources.getDimension(R.dimen.chart_line_circle_inner_radius);
 
         chartStrokeWidth = resources.getDimension(R.dimen.reactive_chart_stroke_width);
     }
@@ -210,7 +213,6 @@ public class ReactiveChartView extends ChartView {
         Circle(int color, String id, boolean visible) {
             paint.setColor(color);
             paint.setStyle(Paint.Style.FILL);
-            paint.setStrokeWidth(5f);
             this.id = id;
             this.isLineVisible = visible;
         }
