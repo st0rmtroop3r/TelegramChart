@@ -38,6 +38,8 @@ public class ChartView extends View {
     protected int totalXPadding = leftPadding + rightPadding;
     protected float chartStrokeWidth = 10;
     private ValueAnimator yAxisMaxValueAnimator;
+    private int dataIndexFrom;
+    private int dataIndexTo;
 
     public ChartView(Context context) {
         super(context);
@@ -53,10 +55,28 @@ public class ChartView extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
+        float yBase = viewHeight - paddingBottom;
+        float xBase = xOffset + leftPadding;
+        int li;
         for (int i = chartLines.size() - 1; i >= 0 ; i--) {
             ChartLineView lineView = chartLines.get(i);
             if (lineView.draw) {
-                canvas.drawLines(lineView.lines, lineView.paint);
+                if (lineView.lines == null) return;
+                float y = yBase - yInterval * lineView.data[0];
+                lineView.lines[dataIndexFrom << 2] = xBase;
+                lineView.lines[(dataIndexFrom << 2) + 1] = y;
+                for (int j = dataIndexFrom + 1; j <= dataIndexTo; j++) {
+
+                    float x = xBase + j * xInterval;
+                    y = yBase - yInterval * lineView.data[j];
+                    li = (j << 2) - 2;
+
+                    lineView.lines[li] = x;
+                    lineView.lines[li + 1] = y;
+                    lineView.lines[li + 2] = x;
+                    lineView.lines[li + 3] = y;
+                }
+                canvas.drawLines(lineView.lines, dataIndexFrom << 2, dataIndexTo - dataIndexFrom << 2, lineView.paint);
             }
         }
     }
@@ -72,25 +92,6 @@ public class ChartView extends View {
         rightPadding = getPaddingRight();
         totalXPadding = leftPadding + rightPadding;
         updateView();
-    }
-
-    public void setYAxisMaxValue(int newValue) {
-        if (newValue == targetYAxisMaxValue) return;
-        targetYAxisMaxValue = newValue;
-        int oldValue = yAxisMaxValue;
-
-        if (yAxisMaxValueAnimator != null) {
-            oldValue = (int) yAxisMaxValueAnimator.getAnimatedValue();
-            yAxisMaxValueAnimator.cancel();
-            yAxisMaxValueAnimator.removeAllUpdateListeners();
-        }
-        yAxisMaxValueAnimator = ValueAnimator.ofInt(oldValue, targetYAxisMaxValue);
-        yAxisMaxValueAnimator.addUpdateListener(animation -> {
-            yAxisMaxValue = (int) animation.getAnimatedValue();
-            updateView();
-        });
-        yAxisMaxValueAnimator.setDuration(300);
-        yAxisMaxValueAnimator.start();
     }
 
     public void setChartsData(Chart chart) {
@@ -110,6 +111,25 @@ public class ChartView extends View {
         if (viewWidth > 0 && viewHeight > 0) {
             updateView();
         }
+    }
+
+    public void setYAxisMaxValue(int newValue) {
+        if (newValue == targetYAxisMaxValue) return;
+        targetYAxisMaxValue = newValue;
+        int oldValue = yAxisMaxValue;
+
+        if (yAxisMaxValueAnimator != null) {
+            oldValue = (int) yAxisMaxValueAnimator.getAnimatedValue();
+            yAxisMaxValueAnimator.cancel();
+            yAxisMaxValueAnimator.removeAllUpdateListeners();
+        }
+        yAxisMaxValueAnimator = ValueAnimator.ofInt(oldValue, targetYAxisMaxValue);
+        yAxisMaxValueAnimator.addUpdateListener(animation -> {
+            yAxisMaxValue = (int) animation.getAnimatedValue();
+            updateView();
+        });
+        yAxisMaxValueAnimator.setDuration(300);
+        yAxisMaxValueAnimator.start();
     }
 
     public void setZoomRange(float fromPercent, float toPercent) {
@@ -138,38 +158,13 @@ public class ChartView extends View {
         yInterval = (float) (viewHeight - paddingBottom - paddingTop) / yAxisMaxValue;
         xOffset = -totalScaledWidth * xFrom;
 
-        int fromDataIndex = (int) (xAxisLength * xFrom - leftPadding / xInterval);
-        fromDataIndex = fromDataIndex < 0 ? 0 : fromDataIndex;
+        dataIndexFrom = (int) (xAxisLength * xFrom - leftPadding / xInterval);
+        dataIndexFrom = dataIndexFrom < 0 ? 0 : dataIndexFrom;
 
-        float dataFromX = xOffset + leftPadding + fromDataIndex * xInterval;
+        dataIndexTo = (int) (xAxisLength * xTo + rightPadding / xInterval) + 1;
+        dataIndexTo = dataIndexTo > xAxisLength ? xAxisLength : dataIndexTo;
 
-        setupChartsPath(dataFromX, fromDataIndex);
         invalidate();
-    }
-
-    private void setupChartsPath(float dataFromX, int fromDataIndex) {
-
-        for (ChartLineView chart : chartLines) {
-
-            if (chart.lines == null) return;
-
-            float yBase = viewHeight - paddingBottom;
-
-            float x = xOffset + leftPadding;
-            float y = yBase - yInterval * chart.data[0];
-            chart.lines[0] = x;
-            chart.lines[1] = y;
-
-            for (int i = 1; i < chart.data.length; i++) {
-                x = xOffset + leftPadding + i * xInterval;
-                y = yBase - yInterval * chart.data[i];
-                int il = i * 4 - 2;
-                chart.lines[il] = x;
-                chart.lines[il + 1] = y;
-                chart.lines[il + 2] = x;
-                chart.lines[il + 3] = y;
-            }
-        }
     }
 
     public class ChartLineView {
