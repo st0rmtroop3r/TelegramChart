@@ -77,7 +77,7 @@ public class ChartWindowSelector extends ChartView {
         canvas.clipRect(window.windowLeft(), 0, window.windowRight(), viewHeight);
         for (ChartLineView chart : chartLines) {
             if (chart.draw) {
-                canvas.drawPath(chart.path, ((ChameleonChartLine)chart).paintSolid);
+                canvas.drawLines(chart.lines, ((ChameleonChartLine)chart).paintSolid);
             }
         }
     }

@@ -7,7 +7,6 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Path;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -57,7 +56,7 @@ public class ChartView extends View {
         for (int i = chartLines.size() - 1; i >= 0 ; i--) {
             ChartLineView lineView = chartLines.get(i);
             if (lineView.draw) {
-                canvas.drawPath(lineView.path, lineView.paint);
+                canvas.drawLines(lineView.lines, lineView.paint);
             }
         }
     }
@@ -151,23 +150,31 @@ public class ChartView extends View {
     private void setupChartsPath(float dataFromX, int fromDataIndex) {
 
         for (ChartLineView chart : chartLines) {
-            chart.path.reset();
-            chart.path.moveTo(dataFromX, viewHeight - paddingBottom - yInterval * chart.data[fromDataIndex]);
-        }
 
-        for (int i = 1; dataFromX + xInterval * i < viewWidth + xInterval; i++) {
+            if (chart.lines == null) return;
 
-            for (ChartLineView chart : chartLines) {
-                if (fromDataIndex + i > xAxisLength) return;
-                float y = viewHeight - paddingBottom - yInterval * chart.data[fromDataIndex + i];
-                chart.path.lineTo(dataFromX + xInterval * i, y);
+            float yBase = viewHeight - paddingBottom;
+
+            float x = xOffset + leftPadding;
+            float y = yBase - yInterval * chart.data[0];
+            chart.lines[0] = x;
+            chart.lines[1] = y;
+
+            for (int i = 1; i < chart.data.length; i++) {
+                x = xOffset + leftPadding + i * xInterval;
+                y = yBase - yInterval * chart.data[i];
+                int il = i * 4 - 2;
+                chart.lines[il] = x;
+                chart.lines[il + 1] = y;
+                chart.lines[il + 2] = x;
+                chart.lines[il + 3] = y;
             }
         }
     }
 
     public class ChartLineView {
 
-        Path path = new Path();
+        float[] lines;
         Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         int[] data;
         String name;
@@ -188,11 +195,12 @@ public class ChartView extends View {
             for (int aData : data) {
                 if (aData > yAxisMax) yAxisMax = aData;
             }
+            lines = new float[data.length * 4 - 2];
 
             paint.setColor(color);
             paint.setStyle(Paint.Style.STROKE);
-            paint.setStrokeJoin(Paint.Join.ROUND);
-            paint.setStrokeCap(Paint.Cap.ROUND);
+//            paint.setStrokeJoin(Paint.Join.BEVEL);
+//            paint.setStrokeCap(Paint.Cap.BUTT);
             paint.setStrokeWidth(chartStrokeWidth);
 
             animator = new ChartLineAnimator(this);
