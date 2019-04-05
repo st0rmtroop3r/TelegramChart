@@ -126,7 +126,8 @@ public class ChartView extends View {
         yAxisMaxValueAnimator = ValueAnimator.ofInt(oldValue, targetYAxisMaxValue);
         yAxisMaxValueAnimator.addUpdateListener(animation -> {
             yAxisMaxValue = (int) animation.getAnimatedValue();
-            updateView();
+            yInterval = (float) (viewHeight - paddingBottom - paddingTop) / yAxisMaxValue;
+            invalidate();
         });
         yAxisMaxValueAnimator.setDuration(300);
         yAxisMaxValueAnimator.start();
@@ -135,7 +136,8 @@ public class ChartView extends View {
     public void setZoomRange(float fromPercent, float toPercent) {
         xFrom = fromPercent;
         xTo = toPercent;
-        updateView();
+        onZoomChanged();
+        invalidate();
     }
 
     public void setLineVisible(String lineId, boolean visible) {
@@ -150,12 +152,9 @@ public class ChartView extends View {
         return chartLines;
     }
 
-    protected void updateView() {
-
-        float range = xTo - xFrom;
-        totalScaledWidth = viewWidth / range;
+    protected void onZoomChanged() {
+        totalScaledWidth = viewWidth / (xTo - xFrom);
         xInterval = (totalScaledWidth - totalXPadding) / xAxisLength;
-        yInterval = (float) (viewHeight - paddingBottom - paddingTop) / yAxisMaxValue;
         xOffset = -totalScaledWidth * xFrom;
 
         dataIndexFrom = (int) (xAxisLength * xFrom - leftPadding / xInterval);
@@ -163,7 +162,11 @@ public class ChartView extends View {
 
         dataIndexTo = (int) (xAxisLength * xTo + rightPadding / xInterval) + 1;
         dataIndexTo = dataIndexTo > xAxisLength ? xAxisLength : dataIndexTo;
+    }
 
+    protected void updateView() {
+        onZoomChanged();
+        yInterval = (float) (viewHeight - paddingBottom - paddingTop) / yAxisMaxValue;
         invalidate();
     }
 
@@ -194,8 +197,6 @@ public class ChartView extends View {
 
             paint.setColor(color);
             paint.setStyle(Paint.Style.STROKE);
-//            paint.setStrokeJoin(Paint.Join.BEVEL);
-//            paint.setStrokeCap(Paint.Cap.BUTT);
             paint.setStrokeWidth(chartStrokeWidth);
 
             animator = new ChartLineAnimator(this);
@@ -286,7 +287,7 @@ public class ChartView extends View {
         @Override
         public void onAnimationUpdate(ValueAnimator animation) {
             lineView.paint.setAlpha((int) animation.getAnimatedValue());
-            updateView();
+            invalidate();
         }
     }
 
