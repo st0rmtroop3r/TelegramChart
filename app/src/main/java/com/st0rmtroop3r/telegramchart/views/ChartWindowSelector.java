@@ -71,12 +71,21 @@ public class ChartWindowSelector extends ChartView {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        canvas.drawRect(window.frameRect, window.framePaint);
+
+        canvas.save();
+        canvas.clipRect(window.leftDimRect);
         canvas.drawRect(window.leftDimRect, window.sideDimPaint);
+        canvas.restore();
+
+        canvas.save();
+        canvas.clipRect(window.rightDimRect);
         canvas.drawRect(window.rightDimRect, window.sideDimPaint);
+        canvas.restore();
+
         canvas.clipRect(window.windowLeft(), 0, window.windowRight(), viewHeight);
         for (ChartLineView chart : chartLines) {
             if (chart.draw) {
+                canvas.drawRect(window.frameRect, window.framePaint);
                 canvas.drawLines(chart.lines, ((ChameleonChartLine)chart).paintSolid);
             }
         }
