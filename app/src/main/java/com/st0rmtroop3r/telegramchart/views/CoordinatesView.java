@@ -8,9 +8,7 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.graphics.Path;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.View;
@@ -48,11 +46,11 @@ public class CoordinatesView extends View {
     private int textColor = Color.GRAY;
     private int lineColor = Color.LTGRAY;
 
-    private final Matrix matrix = new Matrix();
     private final Paint textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final Path xAxisLinePath = new Path();
-    private final Paint xAxisLinePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final Path yMarkLinesPath = new Path();
+    private final float[] xAxisLine = new float[4];
+    private final Paint xAxisLinePaint = new Paint();
+    private final int yAxisLinesCount = 5;
+    private final float[] yAxisLines = new float[yAxisLinesCount * 4];
     private final AxisMark yStartMark = new AxisMark();
 
     private ArgbEvaluator argbEvaluator = new ArgbEvaluator();
@@ -98,7 +96,7 @@ public class CoordinatesView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
 
-        canvas.drawPath(xAxisLinePath, xAxisLinePaint);
+        canvas.drawLine(xAxisLine[0], xAxisLine[1], xAxisLine[2], xAxisLine[3], xAxisLinePaint);
         canvas.drawText(yStartMark.text, yStartMark.x, yStartMark.y, textPaint);
 
         for (YAxisAnimator animator : yAxisAnimators) {
@@ -123,7 +121,6 @@ public class CoordinatesView extends View {
 
         xAxisLinePaint.setColor(lineColor);
         xAxisLinePaint.setStyle(Paint.Style.STROKE);
-        xAxisLinePaint.setStrokeCap(Paint.Cap.ROUND);
         xAxisLinePaint.setStrokeWidth(resources.getDimension(R.dimen.x_axis_line_width));
 
         xMarksMarginBaseLine = resources.getDimensionPixelSize(R.dimen.coord_x_marks_margin_x_axis);
@@ -134,11 +131,18 @@ public class CoordinatesView extends View {
     }
 
     private void initLines() {
-        xAxisLinePath.moveTo(paddingX, baseLine);
-        xAxisLinePath.lineTo(viewWidth - paddingX, baseLine);
-        for (int i = 1; i <= linesCount; i++) {
-            yMarkLinesPath.moveTo(paddingX, baseLine - lineInterval * i);
-            yMarkLinesPath.lineTo(viewWidth - paddingX, baseLine - lineInterval * i);
+        xAxisLine[0] = paddingX;
+        xAxisLine[1] = baseLine;
+        xAxisLine[2] = viewWidth - paddingX;
+        xAxisLine[3] = baseLine;
+
+        for (int i = 0; i < yAxisLinesCount; i++) {
+            float y = baseLine - lineInterval - lineInterval * i;
+            int j = i * 4;
+            yAxisLines[j] = paddingX;
+            yAxisLines[j + 1] = y;
+            yAxisLines[j + 2] = viewWidth - paddingX;
+            yAxisLines[j + 3] = y;
         }
     }
 
@@ -323,7 +327,7 @@ public class CoordinatesView extends View {
         YAxisAnimator(AxisMark[] marks) {
             yMarks = marks;
             linePaint.setColor(Color.TRANSPARENT);
-            scaleAnimationListener = new ScaleAnimationListener(yMarks, yMarkLinesPath);
+            scaleAnimationListener = new ScaleAnimationListener(yMarks, yAxisLines);
         }
 
         void slideIn(boolean scrollUp) {
@@ -404,7 +408,8 @@ public class CoordinatesView extends View {
             for (AxisMark mark : yMarks) {
                 canvas.drawText(mark.text, mark.x, mark.y, markPaint);
             }
-            canvas.drawPath(scaleAnimationListener.scaledLines, linePaint);
+            canvas.drawLines(scaleAnimationListener.linesForScale, scaleAnimationListener.drawOffset,
+                    scaleAnimationListener.drawCount, linePaint);
         }
 
         void setAnimationsDuration() {
@@ -452,10 +457,11 @@ public class CoordinatesView extends View {
     class ScaleAnimationListener implements ValueAnimator.AnimatorUpdateListener {
 
         final AxisMark[] marks;
-        final Path linesForScale;
-        final Path scaledLines = new Path();
+        final float[] linesForScale;
+        int drawOffset = 0;
+        int drawCount = yAxisLinesCount;
 
-        ScaleAnimationListener(AxisMark[] marks, Path linesForScale) {
+        ScaleAnimationListener(AxisMark[] marks, float[] linesForScale) {
             this.marks = marks;
             this.linesForScale = linesForScale;
         }
@@ -464,14 +470,21 @@ public class CoordinatesView extends View {
         public void onAnimationUpdate(ValueAnimator animation) {
 
             float scaleTo = (float) animation.getAnimatedValue();
-            float offsetY = baseLine - baseLine * scaleTo;
             float scaledInterval = lineInterval * scaleTo;
 
-            matrix.setScale(1f, scaleTo);
+            float yBase = baseLine - scaledInterval;
+            for (int i = 0; i < yAxisLinesCount; i++) {
 
-            scaledLines.set(linesForScale);
-            scaledLines.transform(matrix);
-            scaledLines.offset(0, offsetY);
+                float y = yBase - scaledInterval * i;
+                if (y < 0) {
+                    drawCount = (i + 1) << 2;
+                    break;
+                }
+                int j = i * 4;
+                linesForScale[j + 1] = y;
+                linesForScale[j + 3] = y;
+                drawCount = (i + 1) << 2;
+            }
 
             for (int i = 0; i < marks.length; i++) {
                 marks[i].y = (int) (baseLine - yMarkPaddingLine - scaledInterval * (i + 1));
