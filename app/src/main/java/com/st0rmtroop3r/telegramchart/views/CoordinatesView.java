@@ -92,6 +92,25 @@ public class CoordinatesView extends View {
 
     }
 
+    public void setTextColor(int color) {
+        textColor = color;
+        textPaint.setColor(color);
+        for (YAxisAnimator animator : yAxisAnimators) {
+            animator.markPaint.setColor(color);
+        }
+        invalidate();
+    }
+
+    public void setLinesColor(int color) {
+        lineColor = color;
+        yAxisGridLinePaint.setColor(color);
+        currentYAxisAnimator.linePaint.setColor(color);
+        for (YAxisAnimator animator : yAxisAnimators) {
+            animator.linePaint.setColor(color);
+        }
+        invalidate();
+    }
+
     private void init(Context context) {
 
         Resources resources = context.getResources();

@@ -92,6 +92,11 @@ public class XAxisMarks extends View {
         xAxis.applyXDataRange();
     }
 
+    public void setTextColor(int color) {
+        textPaint.setColor(color);
+        invalidate();
+    }
+
     class XAxis {
 
         AxisMark[] xMarks;

@@ -1,10 +1,13 @@
 package com.st0rmtroop3r.telegramchart;
 
+import android.app.ActionBar;
 import android.app.Activity;
-import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.TypedValue;
@@ -53,10 +56,11 @@ public class MainActivity extends Activity {
     private float xFrom = 0;
     private float xTo = 1;
     private int chartRangeMaxValue;
+    private boolean dark;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        boolean dark = PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
+        dark = PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
                 .getBoolean(PREF_THEME_DARK, false);
         setTheme(dark ? R.style.AppThemeDark : R.style.AppTheme);
         super.onCreate(savedInstanceState);
@@ -131,7 +135,7 @@ public class MainActivity extends Activity {
         Spinner spinner = findViewById(R.id.spn_chart_selector);
         TypedValue typedValue = new TypedValue();
         getTheme().resolveAttribute(R.attr.chart_title_color, typedValue, true);
-        spinner.getBackground().setColorFilter(typedValue.data, PorterDuff.Mode.MULTIPLY);
+        spinner.getBackground().setColorFilter(typedValue.data, PorterDuff.Mode.SRC_IN);
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this, R.layout.widget_spinner_item);
         spinner.setAdapter(arrayAdapter);
         for (int i = 0; i < charts.size(); i++) {
@@ -197,12 +201,69 @@ public class MainActivity extends Activity {
     }
 
     private void switchTheme() {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        boolean dark = sharedPreferences.getBoolean(PREF_THEME_DARK, false);
-        sharedPreferences.edit()
-                .putBoolean(PREF_THEME_DARK, !dark)
-                .commit();
-        recreate();
+        dark = !dark;
+        PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
+                .edit()
+                .putBoolean(PREF_THEME_DARK, dark)
+                .apply();
+//        recreate();
+
+        Resources resources = getResources();
+        int color = resources.getColor(dark ? R.color.colorPrimaryDark_dark : R.color.colorPrimaryDark);
+        getWindow().setStatusBarColor(color);
+
+        ActionBar actionBar = getActionBar();
+        if (actionBar != null) {
+            color = resources.getColor(dark ? R.color.colorPrimary_dark : R.color.colorPrimary);
+            actionBar.setBackgroundDrawable(new ColorDrawable(color));
+        }
+
+        color = resources.getColor(dark ? R.color.window_background : R.color.white);
+        getWindow().setBackgroundDrawable(new ColorDrawable(color));
+//        getWindow().setNavigationBarColor(Color.YELLOW);
+
+        color = resources.getColor(dark ? R.color.text_color_dark : R.color.text_color);
+        xAxisMarks.setTextColor(color);
+        coordinatesView.setTextColor(color);
+
+        color = resources.getColor(dark ? R.color.line_color_dark : R.color.line_color);
+        coordinatesView.setLinesColor(color);
+        View xLine = findViewById(R.id.view_x_axis_line);
+        if (xLine != null) {
+            xLine.setBackgroundColor(color);
+        }
+
+        color = resources.getColor(dark ? R.color.highlight_line_dark : R.color.highlight_line);
+        reactiveChartView.setHighlightLineColor(color);
+
+        color = resources.getColor(dark ? R.color.badge_background_dark: R.color.badge_background_light);
+        reactiveChartView.setBadgeBackgroundColor(color);
+
+        color = resources.getColor(dark ? R.color.badge_title_dark: R.color.dark_grey);
+        reactiveChartView.setBadgeTitleColor(color);
+
+        color = resources.getColor(dark ? R.color.window_selector_dim_dark: R.color.window_selector_dim);
+        chartWindowSelector.setSideDimColor(color);
+
+        color = resources.getColor(dark ? R.color.window_selector_frame_dark: R.color.window_selector_frame);
+        chartWindowSelector.setWindowFrameColor(color);
+
+        color = resources.getColor(dark ? R.color.white: R.color.dark_grey);
+        for (int i = 0; i < checkboxes.getChildCount(); i++) {
+            ((CheckBox)checkboxes.getChildAt(i)).setTextColor(color);
+        }
+
+        int style = dark ? R.style.AppThemeDark : R.style.AppTheme;
+        Resources.Theme theme = getTheme();
+        theme.applyStyle(style, true);
+        Drawable drawable = resources.getDrawable(R.drawable.divider, theme);
+        checkboxes.setDividerDrawable(drawable);
+
+        Spinner spinner = findViewById(R.id.spn_chart_selector);
+        if (spinner != null) {
+            color = resources.getColor(dark ? R.color.chart_title_dark: R.color.chart_title_light);
+            spinner.getBackground().setColorFilter(color, PorterDuff.Mode.SRC_IN);
+        }
     }
 
     private class CheckboxListener implements CompoundButton.OnCheckedChangeListener {

@@ -54,6 +54,10 @@ public class Badge extends LinearLayout {
         txvTitle.setText(newTitle);
     }
 
+    public void setTitleColor(int color) {
+        txvTitle.setTextColor(color);
+    }
+
     public void addValue(String value, String name, int color) {
         BadgeItem badgeItem = new BadgeItem(getContext());
         badgeItem.setData(value, name, color);

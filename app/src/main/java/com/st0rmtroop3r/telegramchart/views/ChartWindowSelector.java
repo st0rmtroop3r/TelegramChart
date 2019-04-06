@@ -126,6 +126,16 @@ public class ChartWindowSelector extends ChartView {
         listener = selectionListener;
     }
 
+    public void setSideDimColor(int color) {
+        window.sideDimPaint.setColor(color);
+        invalidate();
+    }
+
+    public void setWindowFrameColor(int color) {
+        window.framePaint.setColor(color);
+        invalidate();
+    }
+
     private void notifyListener(float left, float right) {
         if (listener != null) {
             float leftPercent = left / getWidth();

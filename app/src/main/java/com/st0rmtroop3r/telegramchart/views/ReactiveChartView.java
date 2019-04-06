@@ -122,6 +122,18 @@ public class ReactiveChartView extends ChartView {
         }
     }
 
+    public void setHighlightLineColor(int color) {
+        line.paint.setColor(color);
+    }
+
+    public void setBadgeBackgroundColor(int color) {
+        badge.setBackgroundColor(color);
+    }
+
+    public void setBadgeTitleColor(int color) {
+        badge.setTitleColor(color);
+    }
+
     public void setBadge(Badge badge) {
         this.badge = badge;
     }
