@@ -25,6 +25,7 @@ import com.st0rmtroop3r.telegramchart.views.ChartView;
 import com.st0rmtroop3r.telegramchart.views.ChartWindowSelector;
 import com.st0rmtroop3r.telegramchart.views.CoordinatesView;
 import com.st0rmtroop3r.telegramchart.views.ReactiveChartView;
+import com.st0rmtroop3r.telegramchart.views.XAxisMarks;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +42,7 @@ public class MainActivity extends Activity {
 
     private ReactiveChartView reactiveChartView;
     private CoordinatesView coordinatesView;
+    private XAxisMarks xAxisMarks;
     private ChartWindowSelector chartWindowSelector;
     private LinearLayout checkboxes;
     private final CheckboxListener checkboxListener = new CheckboxListener();
@@ -63,6 +65,7 @@ public class MainActivity extends Activity {
         reactiveChartView = findViewById(R.id.reactive);
         chartWindowSelector = findViewById(R.id.selector);
         coordinatesView = findViewById(R.id.coordinates);
+        xAxisMarks = findViewById(R.id.x_axis_marks);
         checkboxes = findViewById(R.id.ll_checkboxes);
         reactiveChartView.setBadge(findViewById(R.id.grid));
 
@@ -107,7 +110,7 @@ public class MainActivity extends Activity {
     private void setupChart() {
         chartWindowSelector.setChartsData(chart);
         reactiveChartView.setChartsData(chart);
-        coordinatesView.setXAxisData(chart.xData);
+        xAxisMarks.setXAxisData(chart.xData);
         setupCheckboxes();
     }
 
@@ -154,7 +157,7 @@ public class MainActivity extends Activity {
         int yAxisMax = chartRangeMaxValue / 5 * 5;
         reactiveChartView.setYAxisMaxValue(yAxisMax);
         reactiveChartView.setZoomRange(xFrom, xTo);
-        coordinatesView.setXAxisDataRange(xFrom, xTo);
+        xAxisMarks.setXAxisDataRange(xFrom, xTo);
         coordinatesView.setYAxisMaxValue(yAxisMax);
     }
 

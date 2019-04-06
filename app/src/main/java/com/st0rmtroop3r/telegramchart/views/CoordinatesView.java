@@ -18,9 +18,7 @@ import android.view.animation.Interpolator;
 
 import com.st0rmtroop3r.telegramchart.R;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class CoordinatesView extends View {
@@ -32,14 +30,12 @@ public class CoordinatesView extends View {
     private int paddingTop = 150;
     private int paddingBottom = 100;
     private int yMarkPaddingLine = 20;
-    private int xMarksMarginBaseLine;
     private int lineInterval;
     private int baseLine;
 
     private int viewWidth = 0;
     private int viewHeight = 0;
     private int animDuration = 300;
-    private int xAxisMarkFadeDuration = 150;
 
     private int yAxisMaxValue;
 
@@ -47,8 +43,7 @@ public class CoordinatesView extends View {
     private int lineColor = Color.LTGRAY;
 
     private final Paint textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final float[] xAxisLine = new float[4];
-    private final Paint xAxisLinePaint = new Paint();
+    private final Paint yAxisGridLinePaint = new Paint();
     private final int yAxisLinesCount = 5;
     private final float[] yAxisLines = new float[yAxisLinesCount * 4];
     private final AxisMark yStartMark = new AxisMark();
@@ -56,13 +51,7 @@ public class CoordinatesView extends View {
     private ArgbEvaluator argbEvaluator = new ArgbEvaluator();
     private YAxisAnimator currentYAxisAnimator;
     private List<YAxisAnimator> yAxisAnimators = new ArrayList<>();
-    private XAxis xAxis;
 
-    private long[] xAxisData;
-    private float xAxisDataRangeFrom;
-    private float xAxisDataRangeTo;
-
-    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MMM dd");
 
     public CoordinatesView(Context context) {
         super(context);
@@ -90,20 +79,17 @@ public class CoordinatesView extends View {
         baseLine = viewHeight - paddingBottom;
         initLines();
         initMarks();
-        xAxis.applyXDataRange();
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
 
-        canvas.drawLine(xAxisLine[0], xAxisLine[1], xAxisLine[2], xAxisLine[3], xAxisLinePaint);
         canvas.drawText(yStartMark.text, yStartMark.x, yStartMark.y, textPaint);
 
         for (YAxisAnimator animator : yAxisAnimators) {
             animator.draw(canvas);
         }
 
-        xAxis.draw(canvas);
     }
 
     private void init(Context context) {
@@ -119,22 +105,14 @@ public class CoordinatesView extends View {
         textPaint.setColor(textColor);
         textPaint.setTextSize(resources.getDimension(R.dimen.coordinates_text_size));
 
-        xAxisLinePaint.setColor(lineColor);
-        xAxisLinePaint.setStyle(Paint.Style.STROKE);
-        xAxisLinePaint.setStrokeWidth(resources.getDimension(R.dimen.x_axis_line_width));
-
-        xMarksMarginBaseLine = resources.getDimensionPixelSize(R.dimen.coord_x_marks_margin_x_axis);
+        yAxisGridLinePaint.setColor(lineColor);
+        yAxisGridLinePaint.setStyle(Paint.Style.STROKE);
+        yAxisGridLinePaint.setStrokeWidth(resources.getDimension(R.dimen.x_axis_line_width));
 
         yStartMark.text = "0";
-
-        xAxis = new XAxis();
     }
 
     private void initLines() {
-        xAxisLine[0] = paddingX;
-        xAxisLine[1] = baseLine;
-        xAxisLine[2] = viewWidth - paddingX;
-        xAxisLine[3] = baseLine;
 
         for (int i = 0; i < yAxisLinesCount; i++) {
             float y = baseLine - lineInterval - lineInterval * i;
@@ -174,146 +152,11 @@ public class CoordinatesView extends View {
         currentYAxisAnimator = yAxisAnimator;
     }
 
-    public void setXAxisData(long[] xAxisData) {
-        this.xAxisData = xAxisData;
-        xAxis.setData(xAxisData);
-    }
-
-    public void setXAxisDataRange(float from, float to) {
-        xAxisDataRangeFrom = from;
-        xAxisDataRangeTo = to;
-        xAxis.applyXDataRange();
-    }
-
-    class AxisMark {
-        String text;
-        int x;
-        int y;
-    }
-
-    class XAxis {
-
-        AxisMark[] xMarks;
-        float skipInterval;
-        int skip = 1;
-        int prevSkip = 1;
-        float markWidth = 0;
-        ValueAnimator fadeInAnimator = ValueAnimator.ofObject(argbEvaluator, Color.TRANSPARENT, textColor);
-        ValueAnimator fadeOutAnimator = ValueAnimator.ofObject(argbEvaluator, textColor, Color.TRANSPARENT);
-        Paint fadeOutPaint = new Paint(textPaint);
-        Paint fadeInPaint = new Paint(textPaint);
-        boolean isFadingOut = false;
-        boolean isFadingIn = false;
-
-        XAxis() {
-            fadeInAnimator.setDuration(xAxisMarkFadeDuration);
-            fadeInAnimator.addUpdateListener(animation -> {
-                fadeInPaint.setColor((Integer) animation.getAnimatedValue());
-                invalidate();
-            });
-            fadeInAnimator.addListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationStart(Animator animation) { isFadingIn = true; }
-                @Override
-                public void onAnimationEnd(Animator animation) { isFadingIn = false; }
-            });
-
-            fadeOutAnimator.setDuration(xAxisMarkFadeDuration);
-            fadeOutAnimator.addUpdateListener(animation -> {
-                fadeOutPaint.setColor((Integer) animation.getAnimatedValue());
-                invalidate();
-            });
-            fadeOutAnimator.addListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationStart(Animator animation) { isFadingOut = true; }
-                @Override
-                public void onAnimationEnd(Animator animation) { isFadingOut = false; }
-            });
-        }
-
-        private void applyXDataRange() {
-            if (xAxisData == null || viewWidth == 0) return;
-
-            int xPadding = 50;
-            int totalChartWidth = (int) ((viewWidth) / (xAxisDataRangeTo - xAxisDataRangeFrom));
-
-            float numberOfMarksChartCanFit = (totalChartWidth - markWidth) / markWidth;
-
-            for (int i = 0; i < xMarks.length; i++) {
-                xMarks[i].y = (int) (baseLine + xMarksMarginBaseLine + textPaint.getTextSize());
-                xMarks[i].x = (int) ((totalChartWidth - xPadding - markWidth * 0.1) / xMarks.length * i - totalChartWidth * xAxisDataRangeFrom) + xPadding;
-            }
-
-            skipInterval = xMarks.length / numberOfMarksChartCanFit;
-
-            int newSkip = 2;
-            while (newSkip < skipInterval) {
-                newSkip = newSkip * 2;
-            }
-            if (newSkip == skip) {
-                invalidate();
-                return;
-            }
-            prevSkip = skip;
-            skip = newSkip;
-
-            if (prevSkip > 0 && prevSkip < skip) {
-                // fade out
-                fadeInAnimator.end();
-                fadeOutAnimator.start();
-            } else {
-                // fade in
-                fadeOutAnimator.end();
-                fadeInAnimator.start();
-            }
-        }
-
-        void draw(Canvas canvas) {
-
-            if (isFadingOut) {
-
-                for (int i = 0; i < xMarks.length; i += skip) {
-                    canvas.drawText(xMarks[i].text, xMarks[i].x, xMarks[i].y, textPaint);
-                }
-                for (int i = prevSkip; i < xMarks.length; i = i + prevSkip * 2) {
-                    canvas.drawText(xMarks[i].text, xMarks[i].x, xMarks[i].y, fadeOutPaint);
-                }
-
-            } else if (isFadingIn) {
-
-                for (int i = 0; i < xMarks.length; i += prevSkip) {
-                    canvas.drawText(xMarks[i].text, xMarks[i].x, xMarks[i].y, textPaint);
-                }
-                for (int i = skip; i < xMarks.length; i = i + skip * 2) {
-                    canvas.drawText(xMarks[i].text, xMarks[i].x, xMarks[i].y, fadeInPaint);
-                }
-
-            } else {
-
-                for (int i = 0; i < xMarks.length; i += skip) {
-                    canvas.drawText(xMarks[i].text, xMarks[i].x, xMarks[i].y, textPaint);
-                }
-            }
-        }
-
-        void setData(long[] xAxisData) {
-            markWidth = 0;
-            xMarks = new AxisMark[xAxisData.length];
-            for (int i = 0; i < xAxisData.length; i++) {
-                xMarks[i] = new AxisMark();
-                xMarks[i].text = simpleDateFormat.format(new Date(xAxisData[i]));
-                float measuredText = textPaint.measureText(xMarks[i].text) * 1.1f;
-                if (measuredText > markWidth) {
-                    markWidth = measuredText;
-                }
-            }
-        }
-    }
 
     class YAxisAnimator {
 
         AxisMark[] yMarks;
-        Paint linePaint = new Paint(xAxisLinePaint);
+        Paint linePaint = new Paint(yAxisGridLinePaint);
         Paint markPaint = new Paint(textPaint);
 
         ScaleAnimationListener scaleAnimationListener;

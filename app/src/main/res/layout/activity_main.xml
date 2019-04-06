@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -8,57 +7,71 @@
         android:id="@+id/spn_chart_selector"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
         android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true" />
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp" />
 
     <com.st0rmtroop3r.telegramchart.views.CoordinatesView
         android:id="@+id/coordinates"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/coordinates_height"
-        android:paddingTop="30dp"
-        android:paddingBottom="@dimen/coordinates_bottom_padding"
-        android:layout_below="@id/spn_chart_selector" />
+        android:layout_height="@dimen/chart_height"
+        android:layout_below="@id/spn_chart_selector"
+        android:paddingTop="30dp" />
+
+    <View
+        android:id="@+id/view_x_axis_line"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/x_axis_line_width"
+        android:layout_below="@id/coordinates"
+        android:layout_marginStart="@dimen/margin_horizontal"
+        android:layout_marginEnd="@dimen/margin_horizontal"
+        android:background="?attr/axis_lines_color" />
+
+    <com.st0rmtroop3r.telegramchart.views.XAxisMarks
+        android:id="@+id/x_axis_marks"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:layout_below="@id/view_x_axis_line" />
 
     <com.st0rmtroop3r.telegramchart.views.ReactiveChartView
         android:id="@+id/reactive"
         android:layout_width="match_parent"
         android:layout_height="@dimen/chart_height"
         android:layout_below="@id/spn_chart_selector"
-        android:paddingTop="30dp"
-        android:paddingLeft="@dimen/margin_horizontal"
         android:paddingStart="@dimen/margin_horizontal"
-        android:paddingRight="@dimen/margin_horizontal"
-        android:paddingEnd="@dimen/margin_horizontal" />
+        android:paddingLeft="@dimen/margin_horizontal"
+        android:paddingTop="30dp"
+        android:paddingEnd="@dimen/margin_horizontal"
+        android:paddingRight="@dimen/margin_horizontal" />
 
     <com.st0rmtroop3r.telegramchart.views.ChartWindowSelector
         android:id="@+id/selector"
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:layout_below="@id/coordinates"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="16dp"
-        android:layout_marginLeft="@dimen/margin_horizontal"
+        android:layout_below="@id/x_axis_marks"
         android:layout_marginStart="@dimen/margin_horizontal"
-        android:layout_marginRight="@dimen/margin_horizontal"
+        android:layout_marginLeft="@dimen/margin_horizontal"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="@dimen/margin_horizontal"
+        android:layout_marginRight="@dimen/margin_horizontal"
+        android:layout_marginBottom="16dp"
         android:paddingTop="2dp" />
 
     <com.st0rmtroop3r.telegramchart.views.Badge
         android:id="@+id/grid"
-        android:visibility="gone"
-        android:elevation="2dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="-16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginStart="-16dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
         android:background="@drawable/round_corners"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:elevation="2dp"
+        android:paddingLeft="16dp"
+        android:paddingTop="8dp"
+        android:paddingRight="16dp"
+        android:paddingBottom="8dp"
+        android:visibility="gone" />
 
     <ScrollView
         android:layout_width="match_parent"
@@ -70,8 +83,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:divider="@drawable/divider"
-            android:showDividers="middle"
-            android:orientation="vertical" />
+            android:orientation="vertical"
+            android:showDividers="middle" />
 
     </ScrollView>
 
