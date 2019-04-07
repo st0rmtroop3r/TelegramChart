@@ -81,7 +81,8 @@ public class ChartWindowSelector extends ChartView {
         canvas.clipRect(window.rightDimRect);
         canvas.drawRect(window.rightDimRect, window.sideDimPaint);
         canvas.restore();
-
+//                    labelPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_OUT));
+//                    canvas.drawColor(234232, PorterDuff.Mode.CLEAR);
         canvas.clipRect(window.windowLeft(), 0, window.windowRight(), viewHeight);
         for (ChartLineView chart : chartLines) {
             if (chart.draw) {

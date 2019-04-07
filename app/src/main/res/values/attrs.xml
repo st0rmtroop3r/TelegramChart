@@ -4,8 +4,9 @@
     <attr name="axis_marks_text_color" format="color|reference" />
     <attr name="axis_lines_color" format="color|reference" />
     <attr name="highlight_line_color" format="color|reference" />
-    <attr name="badge_background_color" format="color|reference" />
-    <attr name="badge_title_color" format="color|reference" />
+    <attr name="label_background_color" format="color|reference" />
+    <attr name="label_title_color" format="color|reference" />
+    <attr name="label_frame_color" format="color|reference" />
     <attr name="window_selector_dim_color" format="color|reference" />
     <attr name="window_selector_frame_color" format="color|reference" />
     <attr name="line_checkbox_text_color" format="color|reference" />

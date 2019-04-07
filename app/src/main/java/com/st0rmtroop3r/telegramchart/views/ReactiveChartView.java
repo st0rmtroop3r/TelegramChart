@@ -29,8 +29,9 @@ public class ReactiveChartView extends ChartView {
     private float circleInnerRadius = 15f;
     private int currentHighlightIndex = -1;
     private long[] xData;
-    private Badge badge;
-    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEE, MMM dd");
+    private Label label = new Label();
+    private float labelMargin = 50;
+    private SimpleDateFormat lableDateFormat = new SimpleDateFormat("EEE, dd MMM YYYY");
 
     public ReactiveChartView(Context context) {
         super(context);
@@ -66,12 +67,26 @@ public class ReactiveChartView extends ChartView {
         circleInnerRadius = resources.getDimension(R.dimen.chart_line_circle_inner_radius);
 
         chartStrokeWidth = resources.getDimension(R.dimen.reactive_chart_stroke_width);
+
+        labelMargin = resources.getDimension(R.dimen.label_padding);
+        theme.resolveAttribute(R.attr.label_background_color, typedValue, true);
+        label.setBackgroundColor(typedValue.data);
+        theme.resolveAttribute(R.attr.label_title_color, typedValue, true);
+        label.setTextColor(typedValue.data);
+        theme.resolveAttribute(R.attr.label_frame_color, typedValue, true);
+        label.setFrameColor(typedValue.data);
+        label.setTextSize(resources.getDimension(R.dimen.label_text_size));
+        label.setMinWidth(resources.getDimension(R.dimen.label_min_width));
+        label.setArrowDrawable(resources.getDrawable(R.drawable.ic_arrow_right));
+        label.setRowSpacing(resources.getDimension(R.dimen.label_row_spacing));
+        label.setColumnSpacing(resources.getDimension(R.dimen.label_column_spacing));
+        label.setPadding(resources.getDimension(R.dimen.label_padding));
+
     }
 
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-        badge.chartWidth = viewWidth;
         line.y1 = viewHeight;
     }
 
@@ -85,6 +100,8 @@ public class ReactiveChartView extends ChartView {
             Circle c = circles.get(i);
             if (c.isLineVisible) c.draw(canvas);
         }
+
+        label.draw(canvas);
     }
 
     @Override
@@ -121,36 +138,53 @@ public class ReactiveChartView extends ChartView {
             if (circle.id.equals(lineId)) circle.isLineVisible = visible;
         }
     }
+//
+//    @Override
+//    public void setZoomRange(float fromPercent, float toPercent) {
+//        super.setZoomRange(fromPercent, toPercent);
+//        if (!labelLock) {
+//            label.show = false;
+//        }
+//    }
 
     public void setHighlightLineColor(int color) {
         line.paint.setColor(color);
     }
 
-    public void setBadgeBackgroundColor(int color) {
-        badge.setBackgroundColor(color);
+    public void setLabelBackgroundColor(int color) {
+        label.setBackgroundColor(color);
     }
 
-    public void setBadgeTitleColor(int color) {
-        badge.setTitleColor(color);
+    public void setLabelTitleColor(int color) {
+        label.setTextColor(color);
     }
 
-    public void setBadge(Badge badge) {
-        this.badge = badge;
+    public void setLabelFrameColor(int color) {
+        label.setFrameColor(color);
     }
+
+    public void setCircleInnerColor(int color) {
+        innerCirclePaint.setColor(color);
+    }
+
+//    boolean labelLock;
 
     private void onActionDown(float x) {
+//        labelLock = !labelLock;
         if (isHighlightAvailable(x)) invalidate();
     }
 
     private void onActionMove(float x) {
+//        labelLock = true;
         resetHighlightPaths();
         if (isHighlightAvailable(x)) invalidate();
     }
 
     private void onActionUp() {
+//        if (labelLock) return;
         currentHighlightIndex = -1;
-        badge.setVisibility(GONE);
-        badge.removeValues();
+        label.show = false;
+        label.clear();
         resetHighlightPaths();
         invalidate();
     }
@@ -169,18 +203,25 @@ public class ReactiveChartView extends ChartView {
         line.x = xCoordinate;
         line.isShowing = true;
 
-        badge.removeValues();
+        label.clear();
         for (int i = 0; i < chartLines.size(); i++) {
             ChartLineView chart = chartLines.get(i);
             if (!chart.visible) continue;
             circles.get(i).setCoordinates(xCoordinate, viewHeight - yInterval * chart.data[dataIndex]);
             circles.get(i).isShowing = true;
-            badge.addValue("" + chart.data[dataIndex], chart.name, chart.paint.getColor());
+            label.addValue(chart.name, "" + chart.data[dataIndex], chart.paint.getColor());
         }
 
-        badge.setTitle(simpleDateFormat.format(new Date(xData[dataIndex])));
-        badge.setX(xCoordinate);
-        badge.setVisibility(VISIBLE);
+        label.setTitle(lableDateFormat.format(new Date(xData[dataIndex])));
+        float labelWidth = label.getWidth();
+        float labelX = xCoordinate - labelWidth / 2;
+        if (labelX < labelMargin) {
+            labelX = labelMargin;
+        } else if (labelX + labelWidth + labelMargin > viewWidth) {
+            labelX = viewWidth - labelWidth - labelMargin;
+        }
+        label.setX(labelX);
+        label.show = true;
         currentHighlightIndex = dataIndex;
     }
 

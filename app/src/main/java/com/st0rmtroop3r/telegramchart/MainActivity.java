@@ -71,7 +71,6 @@ public class MainActivity extends Activity {
         coordinatesView = findViewById(R.id.coordinates);
         xAxisMarks = findViewById(R.id.x_axis_marks);
         checkboxes = findViewById(R.id.ll_checkboxes);
-        reactiveChartView.setBadge(findViewById(R.id.grid));
 
         List<String> ids = null;
         if (savedInstanceState != null) {
@@ -220,6 +219,7 @@ public class MainActivity extends Activity {
 
         color = resources.getColor(dark ? R.color.window_background : R.color.white);
         getWindow().setBackgroundDrawable(new ColorDrawable(color));
+        reactiveChartView.setCircleInnerColor(color);
 //        getWindow().setNavigationBarColor(Color.YELLOW);
 
         color = resources.getColor(dark ? R.color.text_color_dark : R.color.text_color);
@@ -236,11 +236,14 @@ public class MainActivity extends Activity {
         color = resources.getColor(dark ? R.color.highlight_line_dark : R.color.highlight_line);
         reactiveChartView.setHighlightLineColor(color);
 
-        color = resources.getColor(dark ? R.color.badge_background_dark: R.color.badge_background_light);
-        reactiveChartView.setBadgeBackgroundColor(color);
+        color = resources.getColor(dark ? R.color.label_background_dark : R.color.label_background_light);
+        reactiveChartView.setLabelBackgroundColor(color);
 
-        color = resources.getColor(dark ? R.color.badge_title_dark: R.color.dark_grey);
-        reactiveChartView.setBadgeTitleColor(color);
+        color = resources.getColor(dark ? R.color.label_title_dark : R.color.dark_grey);
+        reactiveChartView.setLabelTitleColor(color);
+
+        color = resources.getColor(dark ? R.color.label_frame_dark: R.color.label_frame_light);
+        reactiveChartView.setLabelFrameColor(color);
 
         color = resources.getColor(dark ? R.color.window_selector_dim_dark: R.color.window_selector_dim);
         chartWindowSelector.setSideDimColor(color);

@@ -3,9 +3,6 @@
     <!-- Base application theme. -->
     <style name="AppTheme">
         <!-- Customize your theme here. -->
-        <!--<item name="colorPrimary">@color/colorPrimary</item>-->
-        <!--<item name="colorPrimaryDark">@color/colorPrimaryDark</item>-->
-        <!--<item name="colorAccent">@color/colorAccent</item>-->
         <item name="android:colorPrimary">@color/colorPrimary</item>
         <item name="android:colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="android:colorAccent">@color/colorAccent</item>
@@ -13,8 +10,9 @@
         <item name="axis_marks_text_color">@color/text_color</item>
         <item name="axis_lines_color">@color/line_color</item>
         <item name="highlight_line_color">@color/highlight_line</item>
-        <item name="badge_background_color">@color/badge_background_light</item>
-        <item name="badge_title_color">@color/dark_grey</item>
+        <item name="label_background_color">@color/label_background_light</item>
+        <item name="label_title_color">@color/dark_grey</item>
+        <item name="label_frame_color">@color/label_frame_light</item>
         <item name="window_selector_dim_color">@color/window_selector_dim</item>
         <item name="window_selector_frame_color">@color/window_selector_frame</item>
         <item name="line_checkbox_text_color">@color/dark_grey</item>
@@ -30,8 +28,9 @@
         <item name="axis_marks_text_color">@color/text_color_dark</item>
         <item name="axis_lines_color">@color/line_color_dark</item>
         <item name="highlight_line_color">@color/highlight_line_dark</item>
-        <item name="badge_background_color">@color/badge_background_dark</item>
-        <item name="badge_title_color">@color/badge_title_dark</item>
+        <item name="label_background_color">@color/label_background_dark</item>
+        <item name="label_title_color">@color/label_title_dark</item>
+        <item name="label_frame_color">@color/label_frame_dark</item>
         <item name="window_selector_dim_color">@color/window_selector_dim_dark</item>
         <item name="window_selector_frame_color">@color/window_selector_frame_dark</item>
         <item name="line_checkbox_text_color">@color/white</item>
