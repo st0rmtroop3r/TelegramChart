@@ -5,14 +5,13 @@ import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Rect;
+import android.graphics.RectF;
+import android.graphics.Region;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.MotionEvent;
 
 import com.st0rmtroop3r.telegramchart.R;
-import com.st0rmtroop3r.telegramchart.enitity.Chart;
-import com.st0rmtroop3r.telegramchart.enitity.ChartLine;
 
 public class ChartWindowSelector extends ChartView {
 
@@ -23,16 +22,19 @@ public class ChartWindowSelector extends ChartView {
     private SelectionListener listener;
     private int defaultWindowWidth = 400;
     private int minWindowWidth = 300;
-    private int frameSideWidth = 20;
 
     private void init(Context context) {
         Resources resources = context.getResources();
         chartStrokeWidth = resources.getDimension(R.dimen.selector_chart_stroke_width);
         defaultWindowWidth = resources.getDimensionPixelSize(R.dimen.selector_window_default_width);
         minWindowWidth = resources.getDimensionPixelSize(R.dimen.selector_window_min_width);
-        frameSideWidth = resources.getDimensionPixelSize(R.dimen.selector_window_frame_width);
-        frameSideWidth = frameSideWidth / 2 * 2;
         window = new WindowFrame(context);
+        window.frameSideWidth = resources.getDimension(R.dimen.selector_window_frame_width);
+        float frameTopWidth = resources.getDimension(R.dimen.selector_window_frame_top_bottom_width);
+        window.setFrameTopWidth(frameTopWidth);
+        float dashWidth = resources.getDimension(R.dimen.selector_window_dash_width);
+        window.dashPaint.setStrokeWidth(dashWidth);
+        window.cornerRadius = resources.getDimension(R.dimen.selector_window_corner_radius);
     }
 
     public ChartWindowSelector(Context context) {
@@ -51,45 +53,14 @@ public class ChartWindowSelector extends ChartView {
     }
 
     @Override
-    public void setChartsData(Chart chart) {
-        xAxisLength = chart.xData.length - 1;
-        yAxisMaxValue = 0;
-        chartLines.clear();
-        for (ChartLine line : chart.chartLines) {
-            ChameleonChartLine chartLineView = new ChameleonChartLine(line.yData,
-                    Color.parseColor(line.color), line.name, line.id, line.visible);
-            chartLines.add(chartLineView);
-            if (yAxisMaxValue < chartLineView.yAxisMax) {
-                yAxisMaxValue = chartLineView.yAxisMax;
-            }
-        }
-        if (viewWidth > 0 && viewHeight > 0) {
-            updateView();
-        }
-    }
-
-    @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        canvas.save();
-        canvas.clipRect(window.leftDimRect);
-        canvas.drawRect(window.leftDimRect, window.sideDimPaint);
-        canvas.restore();
-
-        canvas.save();
-        canvas.clipRect(window.rightDimRect);
-        canvas.drawRect(window.rightDimRect, window.sideDimPaint);
-        canvas.restore();
-//                    labelPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_OUT));
-//                    canvas.drawColor(234232, PorterDuff.Mode.CLEAR);
-        canvas.clipRect(window.windowLeft(), 0, window.windowRight(), viewHeight);
-        for (ChartLineView chart : chartLines) {
-            if (chart.draw) {
-                canvas.drawRect(window.frameRect, window.framePaint);
-                canvas.drawLines(chart.lines, ((ChameleonChartLine)chart).paintSolid);
-            }
-        }
+        canvas.clipRect(window.innerRect, Region.Op.DIFFERENCE);
+        float r = window.cornerRadius;
+        canvas.drawRoundRect(window.dimRect, r, r, window.sideDimPaint);
+        canvas.drawRoundRect(window.frameRect, r, r, window.framePaint);
+        canvas.drawLines(window.dashLines, window.dashPaint);
     }
 
     @Override
@@ -113,14 +84,6 @@ public class ChartWindowSelector extends ChartView {
             default:
                 return super.onTouchEvent(event);
         }
-    }
-
-    @Override
-    protected void updateView() {
-        for (ChartLineView line : chartLines) {
-            ((ChameleonChartLine)line).paintSolid.setAlpha(line.paint.getAlpha());
-        }
-        super.updateView();
     }
 
     public void setSelectionListener(SelectionListener selectionListener) {
@@ -159,33 +122,62 @@ public class ChartWindowSelector extends ChartView {
 
     private class WindowFrame {
 
-        Rect frameRect = new Rect();
-        Paint framePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        RectF frameRect = new RectF();
+        Paint framePaint = new Paint();
+        RectF innerRect = new RectF();
+        RectF dimRect = new RectF();
+        Paint sideDimPaint = new Paint();
+        Paint dashPaint = new Paint();
+        float[] dashLines = new float[8];
+        private float frameSideWidth = 20;
+        private float frameTopWidth = 10;
+        float cornerRadius = 20;
 
-        Rect leftDimRect = new Rect();
-        Rect rightDimRect = new Rect();
-        Paint sideDimPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-
-        private int frameSideHalfWidth = frameSideWidth / 2;
         private WindowSection section = WindowSection.NONE;
-        private int touchOffset;
+        private float touchOffset;
 
         WindowFrame(Context context) {
             Resources.Theme theme = context.getTheme();
             TypedValue typedValue = new TypedValue();
             theme.resolveAttribute(R.attr.window_selector_frame_color, typedValue, true);
             framePaint.setColor(typedValue.data);
-            framePaint.setStyle(Paint.Style.STROKE);
-            framePaint.setStrokeWidth(frameSideWidth);
+            framePaint.setStyle(Paint.Style.FILL_AND_STROKE);
 
             theme.resolveAttribute(R.attr.window_selector_dim_color, typedValue, true);
             sideDimPaint.setColor(typedValue.data);
             sideDimPaint.setStyle(Paint.Style.FILL);
 
-            frameRect.top = -5;
-            leftDimRect.top = 0;
-            leftDimRect.left = 0;
-            rightDimRect.top = 0;
+            dashPaint.setStyle(Paint.Style.STROKE);
+            dashPaint.setStrokeCap(Paint.Cap.ROUND);
+            dashPaint.setColor(Color.WHITE);
+
+            frameRect.top = 0;
+            dimRect.left = 0;
+            dimRect.top = 0;
+        }
+
+        void setFrameTopWidth(float width) {
+            frameTopWidth = width;
+            innerRect.top = width;
+        }
+
+        void onViewSizeChanged(int width, int height) {
+
+            frameRect.bottom = height;
+            innerRect.bottom = height - frameTopWidth;
+            windowRight(width);
+            windowLeft(windowRight() - defaultWindowWidth);
+
+            dimRect.bottom = height - paddingBottom;
+            dimRect.top = paddingTop;
+            dimRect.right = width;
+
+            dashLines[1] = frameRect.height() / 2.8f;
+            dashLines[5] = dashLines[1];
+            dashLines[3] = frameRect.height() - frameRect.height() / 2.8f;
+            dashLines[7] = dashLines[3];
+
+            notifyListener(windowLeft(), windowRight());
         }
 
         void captureSection(int x) {
@@ -231,14 +223,14 @@ public class ChartWindowSelector extends ChartView {
             }
         }
 
-        int offset(int x) {
+        float offset(int x) {
             return x - windowLeft() - windowWidth() / 2;
         }
 
-        void moveWindow(int x) {
+        void moveWindow(float x) {
 
-            int halfWidth = windowWidth() / 2;
-            int left, right;
+            float halfWidth = windowWidth() / 2;
+            float left, right;
 
             if (x - halfWidth < 0) {
                 left = 0;
@@ -255,12 +247,10 @@ public class ChartWindowSelector extends ChartView {
 
             if (left != windowLeft()) {
                 windowLeft(left);
-                leftDimRect.right = left;
                 changed = true;
             }
             if (right != windowRight()) {
                 windowRight(right);
-                rightDimRect.left = right;
                 changed = true;
             }
             if (changed) {
@@ -270,76 +260,53 @@ public class ChartWindowSelector extends ChartView {
         }
 
         void moveLeftBorder(int x) {
-            int left = windowRight() - minWindowWidth;
+            float left = windowRight() - minWindowWidth;
             if (x < 0) {
                 left = 0;
             } else if (windowRight() - x >= minWindowWidth) {
                 left = x;
             }
             windowLeft(left);
-            leftDimRect.right = windowLeft();
             invalidate();
             notifyListener(windowLeft(), windowRight());
         }
 
         void moveRightBorder(int x) {
-            int right = windowLeft() + minWindowWidth;
+            float right = windowLeft() + minWindowWidth;
             if (x > viewWidth) {
                 right = viewWidth;
             } else if (x - windowLeft() >= minWindowWidth) {
                 right = x;
             }
             windowRight(right);
-            rightDimRect.left = windowRight();
             invalidate();
             notifyListener(windowLeft(), windowRight());
         }
 
-        void onViewSizeChanged(int width, int height) {
-
-            frameRect.bottom = height + 5;
-            windowRight(width);
-            windowLeft(windowRight() - defaultWindowWidth);
-
-            leftDimRect.right = windowLeft();
-            leftDimRect.bottom = height;
-
-            rightDimRect.bottom = height;
-            rightDimRect.right = width;
-            rightDimRect.left = windowRight();
-            notifyListener(windowLeft(), windowRight());
+        float windowWidth() {
+            return frameRect.width();
         }
 
-        int windowWidth() {
-            return frameRect.width() + frameSideWidth;
+        float windowLeft() {
+            return frameRect.left;
         }
 
-        int windowLeft() {
-            return frameRect.left - frameSideHalfWidth;
+        void windowLeft(float x) {
+            frameRect.left = x;
+            innerRect.left = x + frameSideWidth;
+            dashLines[0] = x + frameSideWidth / 2;
+            dashLines[2] = dashLines[0];
         }
 
-        void windowLeft(int x) {
-            frameRect.left = x + frameSideHalfWidth;
+        float windowRight() {
+            return frameRect.right;
         }
 
-        int windowRight() {
-            return frameRect.right + frameSideHalfWidth;
-        }
-
-        void windowRight(int x) {
-            frameRect.right = x - frameSideHalfWidth;
-        }
-    }
-
-    class ChameleonChartLine extends ChartLineView {
-
-        Paint paintSolid;
-
-        ChameleonChartLine(int[] data, int color, String name, String id, boolean visible) {
-            super(data, color, name, id, visible);
-            paintSolid = new Paint(paint);
-            paint.setAlpha((int) (255 * 0.6));
-            paintSolid.setAntiAlias(true);
+        void windowRight(float x) {
+            frameRect.right = x;
+            innerRect.right = x - frameSideWidth;
+            dashLines[4] = x - frameSideWidth / 2;
+            dashLines[6] = dashLines[4];
         }
     }
 

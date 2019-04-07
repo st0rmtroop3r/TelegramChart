@@ -7,7 +7,7 @@
 
     <color name="colorPrimary_dark">#212D3B</color>
     <color name="colorPrimaryDark_dark">#1A242E</color>
-    <color name="window_background">#1D2733</color>
+    <color name="window_background">#242F3E</color>
 
     <color name="white">#FFF</color>
     <color name="dark_grey">#222222</color>
@@ -27,10 +27,10 @@
     <color name="label_frame_light">#33D8DCDE</color>
     <color name="label_frame_dark">@color/transparent</color>
 
-    <color name="window_selector_frame">#80C9DBE9</color>
-    <color name="window_selector_frame_dark">#BF325068</color>
-    <color name="window_selector_dim">#80F1F5Fd</color>
-    <color name="window_selector_dim_dark">#8019232E</color>
+    <color name="window_selector_frame">#8085A9C3</color>
+    <color name="window_selector_frame_dark">#8067839C</color>
+    <color name="window_selector_dim">#80DBEBF7</color>
+    <color name="window_selector_dim_dark">#803A4C65</color>
 
     <color name="text_color">#96A2AA</color>
     <color name="text_color_dark">#506372</color>

@@ -55,28 +55,35 @@ public class ChartView extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        float yBase = viewHeight - paddingBottom;
-        float xBase = xOffset + leftPadding;
-        int li;
+        setupLines();
         for (int i = chartLines.size() - 1; i >= 0 ; i--) {
             ChartLineView lineView = chartLines.get(i);
             if (lineView.draw) {
                 if (lineView.lines == null) return;
-                float y = yBase - yInterval * lineView.data[0];
-                lineView.lines[dataIndexFrom << 2] = xBase;
-                lineView.lines[(dataIndexFrom << 2) + 1] = y;
-                for (int j = dataIndexFrom + 1; j <= dataIndexTo; j++) {
-
-                    float x = xBase + j * xInterval;
-                    y = yBase - yInterval * lineView.data[j];
-                    li = (j << 2) - 2;
-
-                    lineView.lines[li] = x;
-                    lineView.lines[li + 1] = y;
-                    lineView.lines[li + 2] = x;
-                    lineView.lines[li + 3] = y;
-                }
                 canvas.drawLines(lineView.lines, dataIndexFrom << 2, dataIndexTo - dataIndexFrom << 2, lineView.paint);
+            }
+        }
+    }
+
+    private  void setupLines() {
+        float yBase = viewHeight - paddingBottom;
+        float xBase = xOffset + leftPadding;
+        int li;
+        for (ChartLineView lineView : chartLines) {
+            if (lineView.lines == null || !lineView.draw) continue;
+            float y = yBase - yInterval * lineView.data[0];
+            lineView.lines[dataIndexFrom << 2] = xBase;
+            lineView.lines[(dataIndexFrom << 2) + 1] = y;
+            for (int j = dataIndexFrom + 1; j <= dataIndexTo; j++) {
+
+                float x = xBase + j * xInterval;
+                y = yBase - yInterval * lineView.data[j];
+                li = (j << 2) - 2;
+
+                lineView.lines[li] = x;
+                lineView.lines[li + 1] = y;
+                lineView.lines[li + 2] = x;
+                lineView.lines[li + 3] = y;
             }
         }
     }
@@ -162,6 +169,7 @@ public class ChartView extends View {
 
         dataIndexTo = (int) (xAxisLength * xTo + rightPadding / xInterval) + 1;
         dataIndexTo = dataIndexTo > xAxisLength ? xAxisLength : dataIndexTo;
+        setupLines();
     }
 
     protected void updateView() {

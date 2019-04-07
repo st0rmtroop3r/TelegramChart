@@ -13,7 +13,10 @@
     <dimen name="selector_chart_stroke_width">1dp</dimen>
     <dimen name="selector_window_default_width">120dp</dimen>
     <dimen name="selector_window_min_width">100dp</dimen>
-    <dimen name="selector_window_frame_width">6dp</dimen>
+    <dimen name="selector_window_frame_width">11dp</dimen>
+    <dimen name="selector_window_corner_radius">6dp</dimen>
+    <dimen name="selector_window_dash_width">2dp</dimen>
+    <dimen name="selector_window_frame_top_bottom_width">2dp</dimen>
     <dimen name="chart_line_circle_outer_radius">6dp</dimen>
     <dimen name="chart_line_circle_inner_radius">4dp</dimen>
     <dimen name="label_text_size">16sp</dimen>
