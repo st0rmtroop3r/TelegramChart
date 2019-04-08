@@ -172,9 +172,9 @@ public class ChartWindowSelector extends ChartView {
             dimRect.top = paddingTop;
             dimRect.right = width;
 
-            dashLines[1] = frameRect.height() / 2.8f;
+            dashLines[1] = frameRect.height() / 2.5f;
             dashLines[5] = dashLines[1];
-            dashLines[3] = frameRect.height() - frameRect.height() / 2.8f;
+            dashLines[3] = frameRect.height() - frameRect.height() / 2.5f;
             dashLines[7] = dashLines[3];
 
             notifyListener(windowLeft(), windowRight());

@@ -14,8 +14,8 @@
     <dimen name="selector_window_default_width">120dp</dimen>
     <dimen name="selector_window_min_width">100dp</dimen>
     <dimen name="selector_window_frame_width">11dp</dimen>
-    <dimen name="selector_window_corner_radius">6dp</dimen>
-    <dimen name="selector_window_dash_width">2dp</dimen>
+    <dimen name="selector_window_corner_radius">7dp</dimen>
+    <dimen name="selector_window_dash_width">2.5dp</dimen>
     <dimen name="selector_window_frame_top_bottom_width">2dp</dimen>
     <dimen name="chart_line_circle_outer_radius">6dp</dimen>
     <dimen name="chart_line_circle_inner_radius">4dp</dimen>
@@ -24,7 +24,7 @@
     <dimen name="label_padding">16dp</dimen>
     <dimen name="label_row_spacing">16dp</dimen>
     <dimen name="label_column_spacing">8dp</dimen>
-    <dimen name="checkbox_height">48dp</dimen>
+    <dimen name="checkbox_height">40dp</dimen>
     <dimen name="checkbox_text_size">18sp</dimen>
     <dimen name="checkbox_text_padding_check">8sp</dimen>
     <dimen name="checkbox_check_size">24dp</dimen>
