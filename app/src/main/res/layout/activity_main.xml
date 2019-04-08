@@ -57,21 +57,14 @@
         android:layout_marginRight="@dimen/margin_horizontal"
         android:layout_marginBottom="16dp"
         android:paddingTop="@dimen/selector_window_frame_top_bottom_width"
-        android:paddingBottom="@dimen/selector_window_frame_top_bottom_width"/>
+        android:paddingBottom="@dimen/selector_window_frame_top_bottom_width" />
 
-    <ScrollView
+    <GridLayout
+        android:id="@+id/grl_checkboxes"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/selector">
-
-        <LinearLayout
-            android:id="@+id/ll_checkboxes"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:divider="@drawable/divider"
-            android:orientation="vertical"
-            android:showDividers="middle" />
-
-    </ScrollView>
+        android:layout_height="wrap_content"
+        android:layout_below="@id/selector"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp" />
 
 </RelativeLayout>

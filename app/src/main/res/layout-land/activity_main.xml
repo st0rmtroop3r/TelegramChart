@@ -71,20 +71,14 @@
         android:paddingTop="@dimen/selector_window_frame_top_bottom_width"
         android:paddingBottom="@dimen/selector_window_frame_top_bottom_width" />
 
-    <ScrollView
+
+    <GridLayout
+        android:id="@+id/grl_checkboxes"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_below="@id/spn_chart_selector"
-        android:layout_toEndOf="@id/coordinates">
-
-        <LinearLayout
-            android:id="@+id/ll_checkboxes"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:divider="@drawable/divider"
-            android:orientation="vertical"
-            android:showDividers="middle" />
-
-    </ScrollView>
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
+        android:layout_toEndOf="@id/coordinates" />
 
 </RelativeLayout>

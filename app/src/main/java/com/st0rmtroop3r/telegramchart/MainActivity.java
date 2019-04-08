@@ -2,12 +2,10 @@ package com.st0rmtroop3r.telegramchart;
 
 import android.app.ActionBar;
 import android.app.Activity;
-import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.TypedValue;
@@ -19,13 +17,14 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.LinearLayout;
+import android.widget.GridLayout;
 import android.widget.Spinner;
 
 import com.st0rmtroop3r.telegramchart.enitity.Chart;
 import com.st0rmtroop3r.telegramchart.enitity.ChartLine;
 import com.st0rmtroop3r.telegramchart.views.ChartView;
 import com.st0rmtroop3r.telegramchart.views.ChartWindowSelector;
+import com.st0rmtroop3r.telegramchart.views.CheckBoxButton;
 import com.st0rmtroop3r.telegramchart.views.CoordinatesView;
 import com.st0rmtroop3r.telegramchart.views.ReactiveChartView;
 import com.st0rmtroop3r.telegramchart.views.XAxisMarks;
@@ -47,7 +46,7 @@ public class MainActivity extends Activity {
     private CoordinatesView coordinatesView;
     private XAxisMarks xAxisMarks;
     private ChartWindowSelector chartWindowSelector;
-    private LinearLayout checkboxes;
+    private GridLayout checkboxes;
     private final CheckboxListener checkboxListener = new CheckboxListener();
 
     private List<Chart> charts;
@@ -70,7 +69,7 @@ public class MainActivity extends Activity {
         chartWindowSelector = findViewById(R.id.selector);
         coordinatesView = findViewById(R.id.coordinates);
         xAxisMarks = findViewById(R.id.x_axis_marks);
-        checkboxes = findViewById(R.id.ll_checkboxes);
+        checkboxes = findViewById(R.id.grl_checkboxes);
 
         List<String> ids = null;
         if (savedInstanceState != null) {
@@ -119,10 +118,11 @@ public class MainActivity extends Activity {
 
     private void setupCheckboxes() {
         checkboxes.removeAllViews();
+        checkboxes.setColumnCount(3);
         for (ChartLine chartLine : chart.chartLines) {
-            CheckBox cb = (CheckBox) LayoutInflater.from(this).inflate(R.layout.widget_chart_checkbox, checkboxes, false);
+            CheckBoxButton cb = (CheckBoxButton) LayoutInflater.from(this).inflate(R.layout.widget_chart_checkbox, checkboxes, false);
             cb.setText(chartLine.name);
-            cb.setButtonTintList(ColorStateList.valueOf(Color.parseColor(chartLine.color)));
+            cb.setColor(Color.parseColor(chartLine.color));
             cb.setTag(chartLine);
             cb.setChecked(chartLine.visible);
             cb.setOnCheckedChangeListener(checkboxListener);
@@ -259,8 +259,6 @@ public class MainActivity extends Activity {
         int style = dark ? R.style.AppThemeDark : R.style.AppTheme;
         Resources.Theme theme = getTheme();
         theme.applyStyle(style, true);
-        Drawable drawable = resources.getDrawable(R.drawable.divider, theme);
-        checkboxes.setDividerDrawable(drawable);
 
         Spinner spinner = findViewById(R.id.spn_chart_selector);
         if (spinner != null) {
