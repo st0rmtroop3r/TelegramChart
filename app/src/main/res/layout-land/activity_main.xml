@@ -55,21 +55,25 @@
         android:paddingEnd="@dimen/margin_horizontal"
         android:paddingRight="@dimen/margin_horizontal" />
 
-    <com.st0rmtroop3r.telegramchart.views.ChartWindowSelector
-        android:id="@+id/selector"
+    <com.st0rmtroop3r.telegramchart.views.LineChartView
+        android:id="@+id/chart_preview"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="48dp"
         android:layout_alignEnd="@id/coordinates"
         android:layout_alignParentStart="true"
         android:layout_alignParentBottom="true"
-        android:layout_marginStart="@dimen/margin_horizontal"
-        android:layout_marginLeft="@dimen/margin_horizontal"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="@dimen/margin_horizontal"
-        android:layout_marginRight="@dimen/margin_horizontal"
-        android:layout_marginBottom="16dp"
+        android:layout_margin="16dp"
         android:paddingTop="@dimen/selector_window_frame_top_bottom_width"
-        android:paddingBottom="@dimen/selector_window_frame_top_bottom_width" />
+        android:paddingBottom="@dimen/selector_window_frame_top_bottom_width"  />
+
+    <com.st0rmtroop3r.telegramchart.views.ChartWindowSelector
+        android:id="@+id/selector"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_alignEnd="@id/coordinates"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="16dp"/>
 
 
     <GridLayout

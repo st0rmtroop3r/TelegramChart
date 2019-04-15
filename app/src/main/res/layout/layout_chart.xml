@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/rl_chart"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginTop="16dp"
+    android:layout_marginBottom="32dp"
+    android:background="?attr/chart_background"
+    android:elevation="1dp"
+    android:orientation="vertical">
+
+    <View
+        android:id="@+id/top_baseline"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="40dp" />
+
+    <TextView
+        android:id="@+id/txv_chart_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/top_baseline"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="16dp"
+        android:text="Interactions"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <View
+        android:id="@+id/view_dash_position"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_alignBottom="@id/top_baseline"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="100dp" />
+
+    <TextView
+        android:id="@+id/txv_date_from"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/top_baseline"
+        android:layout_toStartOf="@id/txv_dates_dash"
+        android:text="42 Mac 3456"
+        android:textSize="14sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/txv_dates_dash"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignEnd="@id/view_dash_position"
+        android:layout_alignBottom="@id/top_baseline"
+        android:text=" - "
+        android:textSize="14sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/txv_date_to"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/top_baseline"
+        android:layout_toEndOf="@id/txv_dates_dash"
+        android:text="42 Mac 3456"
+        android:textSize="14sp"
+        android:textStyle="bold" />
+
+    <com.st0rmtroop3r.telegramchart.views.ChartGraphView
+        android:id="@+id/reactive"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/chart_height"
+        android:layout_below="@id/top_baseline"
+        android:paddingStart="16dp"
+        android:paddingTop="30dp"
+        android:paddingEnd="16dp" />
+
+    <com.st0rmtroop3r.telegramchart.views.CoordinatesView2
+        android:id="@+id/coordinates"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/chart_height"
+        android:layout_below="@+id/top_baseline"
+        android:paddingTop="30dp" />
+
+    <com.st0rmtroop3r.telegramchart.views.ToolTipView
+        android:id="@+id/tool_tip"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/chart_height"
+        android:layout_below="@+id/top_baseline"
+        android:paddingTop="30dp" />
+
+    <View
+        android:id="@+id/view_x_axis_line"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/x_axis_line_width"
+        android:layout_below="@id/reactive"
+        android:layout_marginStart="@dimen/margin_horizontal"
+        android:layout_marginEnd="@dimen/margin_horizontal"
+        android:background="?attr/axis_lines_color" />
+
+    <com.st0rmtroop3r.telegramchart.views.XAxisMarks
+        android:id="@+id/x_axis_marks"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:layout_below="@id/view_x_axis_line" />
+
+    <com.st0rmtroop3r.telegramchart.views.ChartGraphPreview
+        android:id="@+id/chart_preview"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_below="@id/x_axis_marks"
+        android:layout_marginStart="@dimen/margin_horizontal"
+        android:layout_marginEnd="@dimen/margin_horizontal"
+        android:layout_marginBottom="16dp"
+        android:paddingTop="@dimen/selector_window_frame_top_bottom_width"
+        android:paddingBottom="@dimen/selector_window_frame_top_bottom_width" />
+
+    <com.st0rmtroop3r.telegramchart.views.ChartWindowSelector
+        android:id="@+id/selector"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_below="@id/x_axis_marks"
+        android:layout_marginStart="@dimen/margin_horizontal"
+        android:layout_marginEnd="@dimen/margin_horizontal"
+        android:paddingTop="@dimen/selector_window_frame_top_bottom_width"
+        android:paddingBottom="@dimen/selector_window_frame_top_bottom_width" />
+
+    <com.st0rmtroop3r.telegramchart.views.ButtonsLayout
+        android:id="@+id/grv_buttons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/selector"
+        android:layout_margin="16dp"
+        android:numColumns="auto_fit" />
+
+</RelativeLayout>

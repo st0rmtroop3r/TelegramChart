@@ -20,12 +20,12 @@ import android.widget.CompoundButton;
 import android.widget.GridLayout;
 import android.widget.Spinner;
 
-import com.st0rmtroop3r.telegramchart.enitity.Chart;
-import com.st0rmtroop3r.telegramchart.enitity.ChartLine;
-import com.st0rmtroop3r.telegramchart.views.ChartView;
+import com.st0rmtroop3r.telegramchart.enitity.ChartData;
+import com.st0rmtroop3r.telegramchart.enitity.ChartYData;
 import com.st0rmtroop3r.telegramchart.views.ChartWindowSelector;
 import com.st0rmtroop3r.telegramchart.views.CheckBoxButton;
 import com.st0rmtroop3r.telegramchart.views.CoordinatesView;
+import com.st0rmtroop3r.telegramchart.views.LineChartView;
 import com.st0rmtroop3r.telegramchart.views.ReactiveChartView;
 import com.st0rmtroop3r.telegramchart.views.XAxisMarks;
 
@@ -49,13 +49,14 @@ public class MainActivity extends Activity {
     private GridLayout checkboxes;
     private final CheckboxListener checkboxListener = new CheckboxListener();
 
-    private List<Chart> charts;
-    private Chart chart;
+    private List<ChartData> charts;
+    private ChartData chart;
     private int selectedChartNumber = 0;
     private float xFrom = 0;
     private float xTo = 1;
     private int chartRangeMaxValue;
     private boolean dark;
+    private LineChartView chartPreview;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +67,7 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         reactiveChartView = findViewById(R.id.reactive);
+        chartPreview = findViewById(R.id.chart_preview);
         chartWindowSelector = findViewById(R.id.selector);
         coordinatesView = findViewById(R.id.coordinates);
         xAxisMarks = findViewById(R.id.x_axis_marks);
@@ -86,7 +88,7 @@ public class MainActivity extends Activity {
         chart = charts.get(selectedChartNumber);
         if (ids != null) {
             for (String id : ids) {
-                for (ChartLine line : chart.chartLines) {
+                for (ChartYData line : chart.yDataList) {
                     if (id.equals(line.id)) line.visible = false;
                 }
             }
@@ -101,7 +103,7 @@ public class MainActivity extends Activity {
         outState.putFloat(BUNDLE_X_FROM, xFrom);
         outState.putFloat(BUNDLE_X_TO, xTo);
         ArrayList<String> ids = new ArrayList<>();
-        for (ChartLine chartLine : chart.chartLines) {
+        for (ChartYData chartLine : chart.yDataList) {
             if (!chartLine.visible) {
                 ids.add(chartLine.id);
             }
@@ -110,7 +112,7 @@ public class MainActivity extends Activity {
     }
 
     private void setupChart() {
-        chartWindowSelector.setChartsData(chart);
+        chartPreview.setChartsData(chart);
         reactiveChartView.setChartsData(chart);
         xAxisMarks.setXAxisData(chart.xData);
         setupCheckboxes();
@@ -118,8 +120,8 @@ public class MainActivity extends Activity {
 
     private void setupCheckboxes() {
         checkboxes.removeAllViews();
-        checkboxes.setColumnCount(3);
-        for (ChartLine chartLine : chart.chartLines) {
+//        checkboxes.setColumnCount(3);
+        for (ChartYData chartLine : chart.yDataList) {
             CheckBoxButton cb = (CheckBoxButton) LayoutInflater.from(this).inflate(R.layout.widget_chart_checkbox, checkboxes, false);
             cb.setText(chartLine.name);
             cb.setColor(Color.parseColor(chartLine.color));
@@ -173,7 +175,7 @@ public class MainActivity extends Activity {
         toDataIndex = toDataIndex > chart.xData.length ? chart.xData.length : toDataIndex;
 
         chartRangeMaxValue = 0;
-        for (ChartLine chartLine : chart.chartLines) {
+        for (ChartYData chartLine : chart.yDataList) {
             if (!chartLine.visible) continue;
             for (int i = fromDataIndex; i < toDataIndex; i++) {
                 if (chartLine.yData[i] > chartRangeMaxValue) {
@@ -217,16 +219,16 @@ public class MainActivity extends Activity {
             actionBar.setBackgroundDrawable(new ColorDrawable(color));
         }
 
-        color = resources.getColor(dark ? R.color.window_background : R.color.white);
+        color = resources.getColor(dark ? R.color.window_background_dark : R.color.white);
         getWindow().setBackgroundDrawable(new ColorDrawable(color));
         reactiveChartView.setCircleInnerColor(color);
 //        getWindow().setNavigationBarColor(Color.YELLOW);
 
-        color = resources.getColor(dark ? R.color.text_color_dark : R.color.text_color);
+        color = resources.getColor(dark ? R.color.axis_marks_text_color_dark : R.color.axis_marks_text_color_light);
         xAxisMarks.setTextColor(color);
         coordinatesView.setTextColor(color);
 
-        color = resources.getColor(dark ? R.color.line_color_dark : R.color.line_color);
+        color = resources.getColor(dark ? R.color.grid_line_color_dark : R.color.grid_line_color_light);
         coordinatesView.setLinesColor(color);
         View xLine = findViewById(R.id.view_x_axis_line);
         if (xLine != null) {
@@ -271,21 +273,21 @@ public class MainActivity extends Activity {
 
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-            ChartLine chartLine = (ChartLine) buttonView.getTag();
+            ChartYData chartLine = (ChartYData) buttonView.getTag();
             chartLine.visible = isChecked;
             updateYAxisMaxValue();
             int yAxisMax = chartRangeMaxValue / 5 * 5;
 
             reactiveChartView.setLineVisible(chartLine.id, isChecked);
-            chartWindowSelector.setLineVisible(chartLine.id, isChecked);
+            chartPreview.setLineVisible(chartLine.id, isChecked);
             int chartWindowSelectorMax = 0;
-            for (ChartView.ChartLineView chartLineView : chartWindowSelector.getChartLines()) {
+            for (LineChartView.ChartLineView chartLineView : chartPreview.getChartLines()) {
                 if (!chartLineView.isVisible()) continue;
                 if (chartLineView.getYAxisMax() > chartWindowSelectorMax) {
                     chartWindowSelectorMax = chartLineView.getYAxisMax();
                 }
             }
-            chartWindowSelector.setYAxisMaxValue(chartWindowSelectorMax);
+            chartPreview.setYAxisMaxValue(chartWindowSelectorMax);
             reactiveChartView.setYAxisMaxValue(yAxisMax);
             coordinatesView.setYAxisMaxValue(yAxisMax);
         }

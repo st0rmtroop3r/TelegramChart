@@ -2,10 +2,11 @@ package com.st0rmtroop3r.telegramchart;
 
 import android.content.Context;
 import android.util.JsonReader;
+import android.util.Log;
 import android.util.Pair;
 
-import com.st0rmtroop3r.telegramchart.enitity.Chart;
-import com.st0rmtroop3r.telegramchart.enitity.ChartLine;
+import com.st0rmtroop3r.telegramchart.enitity.ChartData;
+import com.st0rmtroop3r.telegramchart.enitity.ChartYData;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,19 +18,33 @@ public class DataProvider {
 
     final static String TAG = DataProvider.class.getSimpleName();
 
-    static List<Chart> readChartsData(Context appContext, int resId) {
-        List<Chart> charts = new ArrayList<>();
+    static List<ChartData> readChartsData(Context appContext, int resId) {
+        List<ChartData> charts = new ArrayList<>();
         InputStream in = appContext.getResources().openRawResource(resId);
         try (JsonReader jsonReader = new JsonReader(new InputStreamReader(in))) {
             charts = readCharts(jsonReader);
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
         }
         return charts;
     }
 
-    private static List<Chart> readCharts(JsonReader jsonReader) throws IOException {
-        List<Chart> charts = new ArrayList<>();
+    static ChartData readChartData(Context appContext, int resId) {
+        InputStream in = appContext.getResources().openRawResource(resId);
+        try (JsonReader jsonReader = new JsonReader(new InputStreamReader(in))) {
+            return readChart(jsonReader);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private static List<ChartData> readCharts(JsonReader jsonReader) throws IOException {
+        List<ChartData> charts = new ArrayList<>();
 
         jsonReader.beginArray();
 
@@ -40,8 +55,8 @@ public class DataProvider {
         return charts;
     }
 
-    private static Chart readChart(JsonReader jsonReader) throws IOException {
-        Chart chart = new Chart();
+    private static ChartData readChart(JsonReader jsonReader) throws IOException {
+        ChartData chart = new ChartData();
         jsonReader.beginObject();
 
         while (jsonReader.hasNext()) {
@@ -55,6 +70,18 @@ public class DataProvider {
                 case "colors":
                     readColors(jsonReader, chart);
                     break;
+                case "types":
+                    readTypes(jsonReader, chart);
+                    break;
+                case "y_scaled":
+                    chart.yScaled = jsonReader.nextBoolean();
+                    break;
+                case "stacked":
+                    chart.stacked = jsonReader.nextBoolean();
+                    break;
+                case "percentage":
+                    chart.percentage = jsonReader.nextBoolean();
+                    break;
                 default:
                     jsonReader.skipValue();
                     break;
@@ -65,7 +92,7 @@ public class DataProvider {
         return chart;
     }
 
-    private static void readColumns(JsonReader jsonReader, Chart chart) throws IOException {
+    private static void readColumns(JsonReader jsonReader, ChartData chart) throws IOException {
         jsonReader.beginArray();
         while (jsonReader.hasNext()) {
             Pair<String, List<Long>> pair = readColumn(jsonReader);
@@ -76,13 +103,13 @@ public class DataProvider {
                 }
             }
             if (pair.first.startsWith("y")) {
-                ChartLine chartLine = new ChartLine();
+                ChartYData chartLine = new ChartYData();
                 chartLine.id = pair.first;
                 chartLine.yData = new int[pair.second.size()];
                 for (int i = 0; i < pair.second.size(); i++) {
                     chartLine.yData[i] = pair.second.get(i).intValue();
                 }
-                chart.chartLines.add(chartLine);
+                chart.yDataList.add(chartLine);
             }
         }
         jsonReader.endArray();
@@ -100,11 +127,11 @@ public class DataProvider {
         return new Pair<>(id, longs);
     }
 
-    private static void readNames(JsonReader jsonReader, Chart chart) throws IOException {
+    private static void readNames(JsonReader jsonReader, ChartData chart) throws IOException {
         jsonReader.beginObject();
         while (jsonReader.hasNext()) {
             String nextName = jsonReader.nextName();
-            for (ChartLine chartLine : chart.chartLines) {
+            for (ChartYData chartLine : chart.yDataList) {
                 if (nextName.equals(chartLine.id)) {
                     chartLine.name = jsonReader.nextString();
                 }
@@ -113,11 +140,31 @@ public class DataProvider {
         jsonReader.endObject();
     }
 
-    private static void readColors(JsonReader jsonReader, Chart chart) throws IOException {
+    private static void readTypes(JsonReader jsonReader, ChartData chart) throws IOException {
+        jsonReader.beginObject();
+        while (jsonReader.hasNext()) {
+//            String ns = jsonReader.nextString();
+//            Log.w(TAG, "readTypes: " + ns);
+            boolean consumed = false;
+            String nextName = jsonReader.nextName();
+            for (ChartYData chartLine : chart.yDataList) {
+                if (nextName.equals(chartLine.id)) {
+                    chartLine.type = jsonReader.nextString();
+                    consumed = true;
+                }
+            }
+            if (!consumed) {
+                Log.w(TAG, "readNames: skip '" + jsonReader.nextString() + "'");
+            }
+        }
+        jsonReader.endObject();
+    }
+
+    private static void readColors(JsonReader jsonReader, ChartData chart) throws IOException {
         jsonReader.beginObject();
         while (jsonReader.hasNext()) {
             String nextName = jsonReader.nextName();
-            for (ChartLine chartLine : chart.chartLines) {
+            for (ChartYData chartLine : chart.yDataList) {
                 if (nextName.equals(chartLine.id)) {
                     chartLine.color = jsonReader.nextString();
                 }

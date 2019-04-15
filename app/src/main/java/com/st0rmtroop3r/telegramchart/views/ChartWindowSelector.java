@@ -10,22 +10,27 @@ import android.graphics.Region;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.MotionEvent;
+import android.view.View;
 
 import com.st0rmtroop3r.telegramchart.R;
 
-public class ChartWindowSelector extends ChartView {
+public class ChartWindowSelector extends View {
 
     private static final String TAG = ChartWindowSelector.class.getSimpleName();
 
     private final int touchableHalfWidth = 50;
     private WindowFrame window;
     private SelectionListener listener;
+    private InitialSelectionListener initialSelectionListener;
     private int defaultWindowWidth = 400;
     private int minWindowWidth = 300;
+    private int viewWidth;
+    private int paddingBottom;
+//    private int paddingTop;
 
     private void init(Context context) {
         Resources resources = context.getResources();
-        chartStrokeWidth = resources.getDimension(R.dimen.selector_chart_stroke_width);
+
         defaultWindowWidth = resources.getDimensionPixelSize(R.dimen.selector_window_default_width);
         minWindowWidth = resources.getDimensionPixelSize(R.dimen.selector_window_min_width);
         window = new WindowFrame(context);
@@ -65,29 +70,43 @@ public class ChartWindowSelector extends ChartView {
 
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        super.onSizeChanged(w, h, oldw, oldh);
+        viewWidth = w;
+        paddingBottom = getPaddingBottom();
+//        paddingTop = getPaddingTop();
         window.onViewSizeChanged(w, h);
+        notifyInitialListener(window.windowLeft(), window.windowRight());
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+//        Log.w(TAG, "onTouchEvent: " + event.getAction() + ", x " + event.getX());
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 onActionDown(event.getX());
+                if (window.section != WindowSection.NONE) {
+                    getParent().requestDisallowInterceptTouchEvent(true);
+                }
                 return true;
             case MotionEvent.ACTION_MOVE:
+            case MotionEvent.ACTION_CANCEL:
                 onActionMove(event.getX());
                 return true;
             case MotionEvent.ACTION_UP:
                 onActionUp();
+//                getParent().requestDisallowInterceptTouchEvent(false);
+//                Log.w(TAG, "onTouchEvent: " + getParent());
                 return true;
             default:
-                return super.onTouchEvent(event);
+                return false;
         }
     }
 
     public void setSelectionListener(SelectionListener selectionListener) {
         listener = selectionListener;
+    }
+
+    public void setInitialSelectionListener(InitialSelectionListener selectionListener) {
+        initialSelectionListener = selectionListener;
     }
 
     public void setSideDimColor(int color) {
@@ -105,6 +124,14 @@ public class ChartWindowSelector extends ChartView {
             float leftPercent = left / getWidth();
             float rightPercent = right / getWidth();
             listener.onChange(leftPercent, rightPercent);
+        }
+    }
+
+    private void notifyInitialListener(float left, float right) {
+        if (initialSelectionListener != null) {
+            float leftPercent = left / getWidth();
+            float rightPercent = right / getWidth();
+            initialSelectionListener.onChange(leftPercent, rightPercent);
         }
     }
 
@@ -153,12 +180,13 @@ public class ChartWindowSelector extends ChartView {
 
             frameRect.top = 0;
             dimRect.left = 0;
-            dimRect.top = 0;
+            dimRect.top = frameTopWidth;
         }
 
         void setFrameTopWidth(float width) {
             frameTopWidth = width;
             innerRect.top = width;
+            dimRect.top = frameTopWidth;
         }
 
         void onViewSizeChanged(int width, int height) {
@@ -169,7 +197,7 @@ public class ChartWindowSelector extends ChartView {
             windowLeft(windowRight() - defaultWindowWidth);
 
             dimRect.bottom = height - paddingBottom;
-            dimRect.top = paddingTop;
+            dimRect.top = frameTopWidth;
             dimRect.right = width;
 
             dashLines[1] = frameRect.height() / 2.5f;
@@ -177,7 +205,7 @@ public class ChartWindowSelector extends ChartView {
             dashLines[3] = frameRect.height() - frameRect.height() / 2.5f;
             dashLines[7] = dashLines[3];
 
-            notifyListener(windowLeft(), windowRight());
+//            notifyListener(windowLeft(), windowRight());
         }
 
         void captureSection(int x) {
@@ -321,5 +349,8 @@ public class ChartWindowSelector extends ChartView {
         void onChange(float left, float right);
     }
 
+    public interface InitialSelectionListener {
+        void onChange(float left, float right);
+    }
 
 }

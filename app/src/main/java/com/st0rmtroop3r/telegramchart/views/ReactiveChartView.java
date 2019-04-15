@@ -10,15 +10,16 @@ import android.util.TypedValue;
 import android.view.MotionEvent;
 
 import com.st0rmtroop3r.telegramchart.R;
-import com.st0rmtroop3r.telegramchart.enitity.Chart;
-import com.st0rmtroop3r.telegramchart.enitity.ChartLine;
+import com.st0rmtroop3r.telegramchart.enitity.ChartData;
+import com.st0rmtroop3r.telegramchart.enitity.ChartYData;
+import com.st0rmtroop3r.telegramchart.views.charts.line.LineChartToolTip;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class ReactiveChartView extends ChartView {
+public class ReactiveChartView extends LineChartView {
 
     private static final String TAG = ReactiveChartView.class.getSimpleName();
 
@@ -29,7 +30,7 @@ public class ReactiveChartView extends ChartView {
     private float circleInnerRadius = 15f;
     private int currentHighlightIndex = -1;
     private long[] xData;
-    private Label label = new Label();
+    private LineChartToolTip label = new LineChartToolTip();
     private float labelMargin = 50;
     private SimpleDateFormat lableDateFormat = new SimpleDateFormat("EEE, dd MMM YYYY");
 
@@ -63,8 +64,8 @@ public class ReactiveChartView extends ChartView {
         innerCirclePaint.setColor(typedValue.data);
         innerCirclePaint.setStyle(Paint.Style.FILL);
 
-        circleOuterRadius = resources.getDimension(R.dimen.chart_line_circle_outer_radius);
-        circleInnerRadius = resources.getDimension(R.dimen.chart_line_circle_inner_radius);
+        circleOuterRadius = resources.getDimension(R.dimen.line_chart_circle_outer_radius);
+        circleInnerRadius = resources.getDimension(R.dimen.line_chart_circle_inner_radius);
 
         chartStrokeWidth = resources.getDimension(R.dimen.reactive_chart_stroke_width);
 
@@ -122,11 +123,11 @@ public class ReactiveChartView extends ChartView {
     }
 
     @Override
-    public void setChartsData(Chart newChart) {
+    public void setChartsData(ChartData newChart) {
         super.setChartsData(newChart);
         xData = newChart.xData;
         circles.clear();
-        for (ChartLine chartLine : newChart.chartLines) {
+        for (ChartYData chartLine : newChart.yDataList) {
             circles.add(new Circle(Color.parseColor(chartLine.color), chartLine.id, chartLine.visible));
         }
     }
@@ -140,9 +141,9 @@ public class ReactiveChartView extends ChartView {
     }
 //
 //    @Override
-//    public void setZoomRange(float fromPercent, float toPercent) {
-//        super.setZoomRange(fromPercent, toPercent);
-//        if (!labelLock) {
+//    public void selectRange(float fromPercent, float toPercent) {
+//        super.selectRange(fromPercent, toPercent);
+//        if (!labelShow) {
 //            label.show = false;
 //        }
 //    }
@@ -167,23 +168,24 @@ public class ReactiveChartView extends ChartView {
         innerCirclePaint.setColor(color);
     }
 
-//    boolean labelLock;
+//    boolean labelShow;
 
     private void onActionDown(float x) {
-//        labelLock = !labelLock;
+//        labelShow = !labelShow;
         if (isHighlightAvailable(x)) invalidate();
     }
 
     private void onActionMove(float x) {
-//        labelLock = true;
+//        labelShow = true;
         resetHighlightPaths();
         if (isHighlightAvailable(x)) invalidate();
     }
 
     private void onActionUp() {
-//        if (labelLock) return;
+//        if (labelShow) return;
         currentHighlightIndex = -1;
-        label.show = false;
+//        label.show = false;
+        label.setShow(false);
         label.clear();
         resetHighlightPaths();
         invalidate();
@@ -221,7 +223,8 @@ public class ReactiveChartView extends ChartView {
             labelX = viewWidth - labelWidth - labelMargin;
         }
         label.setX(labelX);
-        label.show = true;
+//        label.show = true;
+        label.setShow(true);
         currentHighlightIndex = dataIndex;
     }
 

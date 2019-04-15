@@ -1,324 +1,301 @@
 package com.st0rmtroop3r.telegramchart.views;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.animation.ValueAnimator;
 import android.content.Context;
-import android.graphics.Canvas;
+import android.content.res.Resources;
 import android.graphics.Color;
-import android.graphics.Paint;
 import android.util.AttributeSet;
+import android.util.Log;
+import android.util.TypedValue;
+import android.view.GestureDetector;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
+import android.widget.CompoundButton;
+import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
-import com.st0rmtroop3r.telegramchart.enitity.Chart;
-import com.st0rmtroop3r.telegramchart.enitity.ChartLine;
+import com.st0rmtroop3r.telegramchart.ChartFactory;
+import com.st0rmtroop3r.telegramchart.ChartFactoryBuilder;
+import com.st0rmtroop3r.telegramchart.R;
+import com.st0rmtroop3r.telegramchart.enitity.ChartData;
+import com.st0rmtroop3r.telegramchart.enitity.ChartYData;
+import com.st0rmtroop3r.telegramchart.views.charts.ChartAnimator;
+import com.st0rmtroop3r.telegramchart.views.charts.YAxis;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
-public class ChartView extends View {
+import androidx.annotation.Nullable;
 
-    private final static String TAG = ChartView.class.getSimpleName();
+public class ChartView extends FrameLayout {
 
-    protected final ArrayList<ChartLineView> chartLines = new ArrayList<>();
-    protected int yAxisMaxValue = 0;
-    protected int targetYAxisMaxValue = 0;
-    protected int xAxisLength = 0;
-    protected float xInterval = 0;
-    protected float yInterval = 0;
-    protected int viewWidth = 0;
-    protected int viewHeight = 0;
-    protected float xFrom = 0;
-    protected float xTo = 1;
-    protected float totalScaledWidth;
-    protected float xOffset;
-    protected int paddingTop = 0;
-    protected int paddingBottom = 0;
-    protected int leftPadding = 0;
-    protected int rightPadding = 0;
-    protected int totalXPadding = leftPadding + rightPadding;
-    protected float chartStrokeWidth = 10;
-    private ValueAnimator yAxisMaxValueAnimator;
-    private int dataIndexFrom;
-    private int dataIndexTo;
+    private static final String TAG = ChartView.class.getSimpleName();
+
+    private ChartGraphPreview preview;
+    ChartData data;
+    private TextView txvChartName;
+    private TextView txvDateFrom;
+    private TextView txvDateTo;
+    private TextView txvDateDash;
+    private ChartGraphView reactive;
+    private CoordinatesView2 coordinatesView;
+    private ToolTipView toolTipView;
+    private XAxisMarks xAxisMarks;
+    private ChartWindowSelector selector;
+    private ButtonsLayout checkboxesLayout;
+    private ChartAnimator chartAnimator;
+    private final List<CheckBoxButton> checkBoxes = new ArrayList<>();
+    private CheckBoxButton touchedCheckBox;
+    private boolean longPressed = false;
+    private ChartDrawable chartPreview;
+    private ChartDrawable chart;
+    private RelativeLayout relativeLayout;
+    private final List<String> dates = new ArrayList<>();
 
     public ChartView(Context context) {
         super(context);
+        init(context);
     }
 
-    public ChartView(Context context, AttributeSet attrs) {
+    public ChartView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
+        init(context);
     }
 
-    public ChartView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public ChartView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-    }
-
-    @Override
-    protected void onDraw(Canvas canvas) {
-        setupLines();
-        for (int i = chartLines.size() - 1; i >= 0 ; i--) {
-            ChartLineView lineView = chartLines.get(i);
-            if (lineView.draw) {
-                if (lineView.lines == null) return;
-                canvas.drawLines(lineView.lines, dataIndexFrom << 2, dataIndexTo - dataIndexFrom << 2, lineView.paint);
-            }
-        }
-    }
-
-    private  void setupLines() {
-        float yBase = viewHeight - paddingBottom;
-        float xBase = xOffset + leftPadding;
-        int li;
-        for (ChartLineView lineView : chartLines) {
-            if (lineView.lines == null || !lineView.draw) continue;
-            float y = yBase - yInterval * lineView.data[0];
-            lineView.lines[dataIndexFrom << 2] = xBase;
-            lineView.lines[(dataIndexFrom << 2) + 1] = y;
-            for (int j = dataIndexFrom + 1; j <= dataIndexTo; j++) {
-
-                float x = xBase + j * xInterval;
-                y = yBase - yInterval * lineView.data[j];
-                li = (j << 2) - 2;
-
-                lineView.lines[li] = x;
-                lineView.lines[li + 1] = y;
-                lineView.lines[li + 2] = x;
-                lineView.lines[li + 3] = y;
-            }
-        }
+        init(context);
     }
 
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-        viewWidth = w;
-        viewHeight = h;
-        paddingTop = getPaddingTop();
-        paddingBottom = getPaddingBottom();
-        leftPadding = getPaddingLeft();
-        rightPadding = getPaddingRight();
-        totalXPadding = leftPadding + rightPadding;
-        updateView();
     }
 
-    public void setChartsData(Chart chart) {
-        xAxisLength = chart.xData.length - 1;
-        yAxisMaxValue = 0;
-        chartLines.clear();
-        for (ChartLine line : chart.chartLines) {
-            ChartLineView chartLineView = new ChartLineView(line.yData,
-                    Color.parseColor(line.color), line.name, line.id, line.visible);
-            chartLines.add(chartLineView);
-            if (yAxisMaxValue < chartLineView.yAxisMax) {
-                yAxisMaxValue = chartLineView.yAxisMax;
-            }
-        }
-        targetYAxisMaxValue = yAxisMaxValue;
-        yAxisMaxValueAnimator = ValueAnimator.ofInt(yAxisMaxValue, yAxisMaxValue);
-        if (viewWidth > 0 && viewHeight > 0) {
-            updateView();
-        }
+    private void init(Context context) {
+        LayoutInflater.from(context).inflate(R.layout.layout_chart, this);
+        relativeLayout = findViewById(R.id.rl_chart);
+        txvChartName = findViewById(R.id.txv_chart_name);
+        txvDateFrom = findViewById(R.id.txv_date_from);
+        txvDateTo = findViewById(R.id.txv_date_to);
+        txvDateDash = findViewById(R.id.txv_dates_dash);
+        reactive = findViewById(R.id.reactive);
+        coordinatesView = findViewById(R.id.coordinates);
+        toolTipView = findViewById(R.id.tool_tip);
+        xAxisMarks = findViewById(R.id.x_axis_marks);
+        preview = findViewById(R.id.chart_preview);
+        selector = findViewById(R.id.selector);
+        checkboxesLayout = findViewById(R.id.grv_buttons);
     }
 
-    public void setYAxisMaxValue(int newValue) {
-        if (newValue == targetYAxisMaxValue) return;
-        targetYAxisMaxValue = newValue;
-        int oldValue = yAxisMaxValue;
-
-        if (yAxisMaxValueAnimator != null) {
-            oldValue = (int) yAxisMaxValueAnimator.getAnimatedValue();
-            yAxisMaxValueAnimator.cancel();
-            yAxisMaxValueAnimator.removeAllUpdateListeners();
+    public void setCharData(ChartData chartData, int position) {
+        Log.w(TAG, "setCharData: " + position);
+        if (chartData == null) {
+            Log.e(TAG, "setCharData: chartData == null" );
+            return;
         }
-        yAxisMaxValueAnimator = ValueAnimator.ofInt(oldValue, targetYAxisMaxValue);
-        yAxisMaxValueAnimator.addUpdateListener(animation -> {
-            yAxisMaxValue = (int) animation.getAnimatedValue();
-            yInterval = (float) (viewHeight - paddingBottom - paddingTop) / yAxisMaxValue;
-            invalidate();
+
+        ChartFactory factory = new ChartFactoryBuilder(getContext())
+                .type(chartData.yDataList.get(0).type)
+                .isYScaled(chartData.yScaled)
+                .isStacked(chartData.stacked)
+                .isPercentage(chartData.percentage)
+                .build();
+        chartPreview = factory.getChartPreview();
+        chart = factory.getChart();
+        if (chartPreview == null) {
+            Log.e(TAG, "setCharData: chartPreview == null" );
+            return;
+        }
+        formatDates(chartData.xData);
+        chartPreview.setData(chartData);
+        chart.setData(chartData);
+
+        txvChartName.setText(factory.getName());
+
+        YAxis yAxis = factory.getyAxis();
+        yAxis.viewHolder = coordinatesView;
+        chartAnimator = factory.getAnimator();
+        chartAnimator.yAxis = yAxis;
+        chartAnimator.setChartPreview(chartPreview);
+        chartAnimator.setChart(chart);
+        chartAnimator.setGraphPreview(preview);
+        chartAnimator.setGraphView(reactive);
+
+        preview.setChart(chartPreview);
+        reactive.setChart(chart);
+        toolTipView.setChart(chart);
+        toolTipView.setChartView(reactive);
+        coordinatesView.setYAxis(yAxis);
+        xAxisMarks.setXAxisData(chartData.xData);
+
+        toolTipView.setOnToolTipClickListener(dateLong -> {
+            Log.w(TAG, "zoom: " + dateLong);
         });
-        yAxisMaxValueAnimator.setDuration(300);
-        yAxisMaxValueAnimator.start();
+
+        selector.setSelectionListener((left, right) -> {
+            chartAnimator.onSelectedRangeChanged(left, right);
+            xAxisMarks.setXAxisDataRange(left, right);
+            txvDateFrom.setText(getDateAt(left));
+            txvDateTo.setText(getDateAt(right));
+            toolTipView.hideToolTip();
+        });
+        selector.setInitialSelectionListener((left, right) -> {
+            xAxisMarks.setXAxisDataRange(left, right);
+            chartAnimator.setInitialDataRange(left, right);
+            txvDateFrom.setText(getDateAt(left));
+            txvDateTo.setText(getDateAt(right));
+        });
+        setupButtons(chartData.yDataList);
     }
 
-    public void setZoomRange(float fromPercent, float toPercent) {
-        xFrom = fromPercent;
-        xTo = toPercent;
-        onZoomChanged();
+    private void formatDates(long[] xData) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy");
+        dates.clear();
+        for (long timeMs : xData) {
+            dates.add(dateFormat.format(new Date(timeMs)));
+        }
+    }
+
+    private String getDateAt(float percent) {
+        if (dates.size() == 0) return "";
+        int index = (int) (dates.size() * percent);
+        index = (index < 1) ? 1 : (index > dates.size()) ? dates.size() : index;
+        return dates.get(index - 1);
+    }
+
+    private void setupButtons(List<ChartYData> yDataList) {
+//        Log.w(TAG, "setupButtons: " );
+        checkboxesLayout.removeAllViews();
+        checkBoxes.clear();
+        if (yDataList == null || yDataList.size() < 2) return;
+        LayoutInflater inflater = LayoutInflater.from(getContext());
+        for (ChartYData chartLine : yDataList) {
+            CheckBoxButton cb = (CheckBoxButton) inflater
+                    .inflate(R.layout.widget_chart_checkbox, checkboxesLayout, false);
+            cb.setText(chartLine.name);
+            cb.setColor(Color.parseColor(chartLine.color));
+            cb.setTag(chartLine);
+            cb.setChecked(chartLine.visible);
+            cb.setOnTouchListener(checkBoxTouchListener);
+            cb.setOnCheckedChangeListener(checkboxListener);
+            checkboxesLayout.addView(cb);
+            checkBoxes.add(cb);
+        }
+
+    }
+    public void switchTheme(Resources.Theme theme) {
+
+        reactive.applyTheme(theme);
+        preview.applyTheme(theme);
+
+        TypedValue value = new TypedValue();
+
+        theme.resolveAttribute(R.attr.chart_background, value, true);
+        relativeLayout.setBackgroundColor(value.data);
+
+        theme.resolveAttribute(android.R.attr.textColor, value, true);
+        txvChartName.setTextColor(value.data);
+        txvDateTo.setTextColor(value.data);
+        txvDateFrom.setTextColor(value.data);
+        txvDateDash.setTextColor(value.data);
+
+        theme.resolveAttribute(R.attr.window_selector_dim_color, value, true);
+        selector.setSideDimColor(value.data);
+
+        theme.resolveAttribute(R.attr.window_selector_frame_color, value, true);
+        selector.setWindowFrameColor(value.data);
+
+        theme.resolveAttribute(R.attr.axis_marks_text_color, value, true);
+        xAxisMarks.setTextColor(value.data);
+        coordinatesView.setTextColor(value.data);
+
+        theme.resolveAttribute(R.attr.axis_lines_color, value, true);
+        coordinatesView.setLinesColor(value.data);
+        View xLine = findViewById(R.id.view_x_axis_line);
+        if (xLine != null) {
+            xLine.setBackgroundColor(value.data);
+        }
+        toolTipView.invalidate();
         invalidate();
     }
 
-    public void setLineVisible(String lineId, boolean visible) {
-        for (ChartLineView line : chartLines) {
-            if (line.id.equals(lineId)) {
-                line.setVisible(visible);
+    private final CompoundButton.OnCheckedChangeListener checkboxListener = new CompoundButton.OnCheckedChangeListener () {
+        @Override
+        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+            ChartYData chartLine = (ChartYData) buttonView.getTag();
+            chartLine.visible = isChecked;
+            chartAnimator.onSeriesCheckChanged(chartLine.id, isChecked);
+        }
+    };
+
+    private final GestureDetector.SimpleOnGestureListener gestureListener = new GestureDetector.SimpleOnGestureListener() {
+
+        @Override
+        public void onLongPress(MotionEvent e) {
+            Log.w("GestureListener", "onLongPress: " + e.getAction());
+            if (touchedCheckBox == null) return;
+            longPressed = true;
+            ChartYData pressedData = (ChartYData) touchedCheckBox.getTag();
+            for (CheckBoxButton button : checkBoxes) {
+                ChartYData data = (ChartYData) button.getTag();
+                if (data.id.equals(pressedData.id)) {
+                    button.setOnCheckedChangeListener(null);
+                    button.setChecked(true);
+                    button.invalidate();
+                    data.visible = true;
+                } else {
+                    button.setOnCheckedChangeListener(null);
+                    button.setChecked(false);
+                    button.invalidate();
+                    button.setOnCheckedChangeListener(checkboxListener);
+                    data.visible = false;
+                }
             }
-        }
-    }
-
-    public ArrayList<ChartLineView> getChartLines() {
-        return chartLines;
-    }
-
-    protected void onZoomChanged() {
-        totalScaledWidth = viewWidth / (xTo - xFrom);
-        xInterval = (totalScaledWidth - totalXPadding) / xAxisLength;
-        xOffset = -totalScaledWidth * xFrom;
-
-        dataIndexFrom = (int) (xAxisLength * xFrom - leftPadding / xInterval);
-        dataIndexFrom = dataIndexFrom < 0 ? 0 : dataIndexFrom;
-
-        dataIndexTo = (int) (xAxisLength * xTo + rightPadding / xInterval) + 1;
-        dataIndexTo = dataIndexTo > xAxisLength ? xAxisLength : dataIndexTo;
-        setupLines();
-    }
-
-    protected void updateView() {
-        onZoomChanged();
-        yInterval = (float) (viewHeight - paddingBottom - paddingTop) / yAxisMaxValue;
-        invalidate();
-    }
-
-    public class ChartLineView {
-
-        float[] lines;
-        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        int[] data;
-        String name;
-        String id;
-        int color;
-        int yAxisMax = 0;
-        boolean draw;
-        boolean visible;
-        ChartLineAnimator animator;
-
-        ChartLineView(int[] data, int color, String name, String id, boolean visible) {
-            this.data = data;
-            this.name = name;
-            this.id = id;
-            this.color = color;
-            this.draw = visible;
-            this.visible = visible;
-            for (int aData : data) {
-                if (aData > yAxisMax) yAxisMax = aData;
-            }
-            lines = new float[data.length * 4 - 2];
-
-            paint.setColor(color);
-            paint.setStyle(Paint.Style.STROKE);
-            paint.setStrokeWidth(chartStrokeWidth);
-
-            animator = new ChartLineAnimator(this);
-        }
-
-        void setVisible(boolean visible) {
-            this.visible = visible;
-            if (visible) {
-                animator.showChartLine();
-            } else {
-                animator.hideChartLine();
-            }
-        }
-
-        public boolean isVisible() {
-            return visible;
-        }
-
-        public int getYAxisMax() {
-            return  yAxisMax;
-        }
-    }
-
-    class ChartLineAnimator {
-
-        long animationDuration = 300;
-        ChartLineView lineView;
-        ValueAnimator alphaInAnimator = ValueAnimator.ofInt(0, 255);
-        ValueAnimator alphaOutAnimator = ValueAnimator.ofInt(255, 0);
-        AlphaUpdateListener alphaListener;
-        AnimationListener animationListener;
-
-        ChartLineAnimator(ChartLineView view) {
-            lineView = view;
-            alphaInAnimator.setDuration(animationDuration);
-            alphaOutAnimator.setDuration(animationDuration);
-            alphaListener = new AlphaUpdateListener(view);
-            animationListener = new AnimationListener(view);
-        }
-
-        void showChartLine() {
-
-            lineView.draw = true;
-
-            int alphaFrom = 0;
-            if (alphaOutAnimator.isStarted()) {
-                alphaOutAnimator.cancel();
-                alphaFrom = (int) alphaOutAnimator.getAnimatedValue();
-            }
-
-            alphaInAnimator = ValueAnimator.ofInt(alphaFrom, 255);
-            setupAnimator(alphaInAnimator, alphaListener);
-
-            alphaInAnimator.start();
-        }
-
-        void hideChartLine() {
-
-            lineView.draw = true;
-
-            int alphaFrom = 255;
-            if (alphaInAnimator.isStarted()) {
-                alphaInAnimator.cancel();
-                alphaFrom = (int) alphaInAnimator.getAnimatedValue();
-            }
-
-            alphaOutAnimator = ValueAnimator.ofInt(alphaFrom, 0);
-            setupAnimator(alphaOutAnimator, alphaListener);
-
-            alphaOutAnimator.start();
-        }
-
-        void setupAnimator(ValueAnimator animator, ValueAnimator.AnimatorUpdateListener listener) {
-            animator.addUpdateListener(listener);
-            animator.addListener(animationListener);
-            animator.setDuration(animationDuration);
-        }
-    }
-
-    class AlphaUpdateListener implements ValueAnimator.AnimatorUpdateListener {
-
-        ChartLineView lineView;
-
-        AlphaUpdateListener(ChartLineView view) {
-            lineView = view;
+            chartAnimator.setOnlyOneSeriesSelected(pressedData.id);
         }
 
         @Override
-        public void onAnimationUpdate(ValueAnimator animation) {
-            lineView.paint.setAlpha((int) animation.getAnimatedValue());
-            invalidate();
-        }
-    }
-
-    class AnimationListener extends AnimatorListenerAdapter {
-
-        ChartLineView lineView;
-
-        AnimationListener(ChartLineView view) {
-            lineView = view;
-        }
-
-        @Override
-        public void onAnimationCancel(Animator animation) {
-            ((ValueAnimator)animation).removeAllUpdateListeners();
-            animation.removeAllListeners();
+        public boolean onSingleTapUp(MotionEvent e) {
+            if (touchedCheckBox == null) return false;
+            ChartYData touchedChartLine = (ChartYData) touchedCheckBox.getTag();
+            int checkedCount = 0;
+            CheckBoxButton checkedButton = null;
+            for (CheckBoxButton button : checkBoxes) {
+                if (button.isChecked()) {
+                    checkedCount++;
+                    checkedButton = button;
+                }
+            }
+            if (checkedButton == null) return false;
+            ChartYData checkedId = (ChartYData) checkedButton.getTag();
+            return checkedCount == 1 && touchedChartLine.id.equals(checkedId.id);
         }
 
         @Override
-        public void onAnimationEnd(Animator animation) {
-            lineView.draw = lineView.visible;
-            ((ValueAnimator)animation).removeAllUpdateListeners();
-            animation.removeAllListeners();
+        public boolean onDoubleTapEvent(MotionEvent e) {
+            return true;
         }
-    }
+    };
+
+    private final GestureDetector gestureDetector = new GestureDetector(gestureListener);
+
+    private final OnTouchListener checkBoxTouchListener = (v, event) -> {
+        try {
+            touchedCheckBox = (CheckBoxButton) v;
+        } catch (ClassCastException e) {
+            return false;
+        }
+        if (longPressed && event.getAction() == MotionEvent.ACTION_UP) {
+            touchedCheckBox.setOnCheckedChangeListener(checkboxListener);
+            touchedCheckBox = null;
+            longPressed = false;
+            return true;
+        }
+        return gestureDetector.onTouchEvent(event);
+    };
 
 }

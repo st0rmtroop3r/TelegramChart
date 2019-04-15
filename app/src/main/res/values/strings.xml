@@ -3,4 +3,6 @@
     <string name="statistics">Statistics</string>
     <string name="chart_name">Chart #%d</string>
     <string name="menu_dark_mode">dark mode</string>
+    <string name="title_light"><html><font color="#000">Multi Light</font></html></string>
+    <string name="title_dark"><html><font color="#fff">Multi Dark</font></html></string>
 </resources>

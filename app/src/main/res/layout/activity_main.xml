@@ -45,16 +45,26 @@
         android:paddingEnd="@dimen/margin_horizontal"
         android:paddingRight="@dimen/margin_horizontal" />
 
+    <com.st0rmtroop3r.telegramchart.views.LineChartView
+        android:id="@+id/chart_preview"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_below="@id/x_axis_marks"
+        android:layout_marginStart="@dimen/margin_horizontal"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="@dimen/margin_horizontal"
+        android:layout_marginBottom="16dp"
+        android:paddingTop="@dimen/selector_window_frame_top_bottom_width"
+        android:paddingBottom="@dimen/selector_window_frame_top_bottom_width" />
+
     <com.st0rmtroop3r.telegramchart.views.ChartWindowSelector
         android:id="@+id/selector"
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:layout_below="@id/x_axis_marks"
         android:layout_marginStart="@dimen/margin_horizontal"
-        android:layout_marginLeft="@dimen/margin_horizontal"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="@dimen/margin_horizontal"
-        android:layout_marginRight="@dimen/margin_horizontal"
         android:layout_marginBottom="16dp"
         android:paddingTop="@dimen/selector_window_frame_top_bottom_width"
         android:paddingBottom="@dimen/selector_window_frame_top_bottom_width" />

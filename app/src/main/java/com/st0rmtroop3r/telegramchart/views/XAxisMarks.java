@@ -35,7 +35,7 @@ public class XAxisMarks extends View {
     private float xAxisDataRangeTo;
 
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MMM dd");
-    private XAxis xAxis;
+    XAxis xAxis;
 
     public XAxisMarks(Context context) {
         super(context);
@@ -86,6 +86,7 @@ public class XAxisMarks extends View {
     }
 
     public void setXAxisDataRange(float from, float to) {
+//        Log.w(TAG, "setXAxisDataRange: from  " + from + ", to " + to );
         xAxisDataRangeFrom = from;
         xAxisDataRangeTo = to;
         xAxis.setMarksY();

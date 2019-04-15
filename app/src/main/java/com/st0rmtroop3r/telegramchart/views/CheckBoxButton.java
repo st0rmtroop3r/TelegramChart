@@ -23,7 +23,7 @@ public class CheckBoxButton extends CheckBox {
     private int textColorChecked;
     private int textColorUnchecked;
     private Drawable checkDrawable;
-    private String text;
+    private String text = "";
     private float cornerRadius;
     private float strokeWidth = 50;
     private int viewHeight;
@@ -63,6 +63,7 @@ public class CheckBoxButton extends CheckBox {
         textColorUnchecked = Color.BLUE;
         textColorChecked = Color.WHITE;
         setColor(textColorUnchecked);
+        setBackground(null);
     }
 
     public void setColor(int color) {
@@ -72,6 +73,7 @@ public class CheckBoxButton extends CheckBox {
     }
 
     public void setText(String t) {
+        if (t == null) { t = ""; }
         text = t;
         invalidate();
     }

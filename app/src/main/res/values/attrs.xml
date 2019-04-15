@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <attr name="chart_background" format="color|reference" />
+    <attr name="chart_text_color" format="color|reference" />
     <attr name="axis_marks_text_color" format="color|reference" />
     <attr name="axis_lines_color" format="color|reference" />
     <attr name="highlight_line_color" format="color|reference" />
@@ -12,5 +14,6 @@
     <attr name="line_checkbox_text_color" format="color|reference" />
     <attr name="line_checkbox_divider_color" format="color|reference" />
     <attr name="chart_title_color" format="color|reference" />
+    <attr name="y_axis_text_messages_apps" format="color|reference" />
 
 </resources>

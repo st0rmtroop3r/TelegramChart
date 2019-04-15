@@ -1,13 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#517DA2</color>
-    <color name="colorPrimaryDark">#426382</color>
+    <color name="colorPrimary">#fff</color>
+    <color name="colorPrimaryDark">#fff</color>
     <color name="colorAccent">#D81B60</color>
 
 
     <color name="colorPrimary_dark">#212D3B</color>
     <color name="colorPrimaryDark_dark">#1A242E</color>
-    <color name="window_background">#242F3E</color>
+    <color name="window_background_light">#F0F0F0</color>
+    <color name="window_background_dark">#1B2433</color>
+
+    <color name="chart_background_light">#fff</color>
+    <color name="chart_background_dark">#242F3E</color>
 
     <color name="white">#FFF</color>
     <color name="dark_grey">#222222</color>
@@ -16,6 +20,9 @@
 
     <color name="chart_title_light">#3896D4</color>
     <color name="chart_title_dark">#7BC4FB</color>
+
+    <color name="text_color_light">#000</color>
+    <color name="text_color_dark">#fff</color>
 
     <color name="highlight_line">#80CBD7DF</color>
     <color name="highlight_line_dark">#131C26</color>
@@ -32,15 +39,30 @@
     <color name="window_selector_dim">#80DBEBF7</color>
     <color name="window_selector_dim_dark">#803A4C65</color>
 
-    <color name="text_color">#96A2AA</color>
-    <color name="text_color_dark">#506372</color>
-    <color name="line_color">#F1F1F2</color>
-    <color name="line_color_dark">#161F2B</color>
+    <color name="axis_marks_text_color_light">#8E8E93</color>
+    <color name="axis_marks_text_color_dark">#99A3B1C2</color>
+    <color name="grid_line_color_light">#1A182D3B</color>
+    <color name="grid_line_color_dark">#1AFFFFFF</color>
+    
+    <color name="y_axis_text_messages_apps_light">#800606EB</color>
+    <!--<color name="y_axis_text_messages_apps_light">#80252529</color>-->
+    <color name="y_axis_text_messages_apps_dark">#80ECF2F8</color>
+    <color name="x_axis_text_messages_apps_light">#80252529</color>
+    <color name="x_axis_text_messages_apps_dark">#99A3B1C2</color>
 
     <color name="divider_light">#E0E0E0</color>
     <color name="divider_dark">#0B131E</color>
 
     <color name="arrow_color">#D2D5D7</color>
     <color name="arrow_color_dark">#767C85</color>
+
+    <color name="y0">#3497ED</color>
+    <color name="y1">#2373DB</color>
+    <color name="y2">#9ED448</color>
+    <color name="y3">#5FB641</color>
+    <color name="y4">#F5BD25</color>
+    <color name="y5">#F79E39</color>
+    <color name="y6">#E65850</color>
+
 
 </resources>
