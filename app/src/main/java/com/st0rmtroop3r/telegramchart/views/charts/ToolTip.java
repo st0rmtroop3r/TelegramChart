@@ -67,6 +67,7 @@ public abstract class ToolTip {
     }
 
     public void setTextSize(float size) {
+        textSize = size;
         titlePaint.setTextSize(size);
         itemNamePaint.setTextSize(size);
         itemValuePaint.setTextSize(size);
