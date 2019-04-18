@@ -30,5 +30,6 @@
     <dimen name="checkbox_text_padding_check">8sp</dimen>
     <dimen name="checkbox_check_size">20dp</dimen>
     <dimen name="checkbox_stroke_width">2dp</dimen>
+    <dimen name="dates_range_text_size">14sp</dimen>
 
 </resources>

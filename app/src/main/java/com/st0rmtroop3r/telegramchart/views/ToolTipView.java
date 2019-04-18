@@ -71,6 +71,7 @@ public class ToolTipView extends View {
     }
 
     public void hideToolTip() {
+        if (!showToolTip) return;
         showToolTip = false;
         if (chart != null) {
             chart.onUp();

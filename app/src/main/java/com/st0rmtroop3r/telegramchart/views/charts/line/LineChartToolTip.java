@@ -2,7 +2,6 @@ package com.st0rmtroop3r.telegramchart.views.charts.line;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.util.Log;
 
 import com.st0rmtroop3r.telegramchart.views.charts.ToolTip;
 
@@ -46,7 +45,6 @@ public class LineChartToolTip extends ToolTip {
         float rowY = titleY;
         for (Text text: names.texts) {
             rowY += textSize + rowSpacing;
-            Log.w(TAG, "draw: rowY " + rowY + " = textSize " + textSize + " + rowSpacing " + rowSpacing);
             canvas.drawText(text.string, titleX, rowY, text.paint);
         }
         // draw values
@@ -89,36 +87,4 @@ public class LineChartToolTip extends ToolTip {
             text.paint.setColor(color);
         }
     }
-//
-//    class Column {
-//
-//        float width = 0;
-//        float height = 0;
-//        List<Text> texts = new LinkedList<>();
-//
-//        void addText(String s, Paint p) {
-//            Text text = new Text(s, p);
-//            texts.add(text);
-//            if (width < text.textWidth) width = text.textWidth;
-//            height += (p.getTextSize() + rowSpacing);
-//        }
-//
-//        void clear() {
-//            texts.clear();
-//            width = 0;
-//            height = 0;
-//        }
-//    }
-//
-//    class Text {
-//        String string;
-//        Paint paint;
-//        float textWidth;
-//
-//        Text(String s, Paint p) {
-//            string = s;
-//            paint = p;
-//            textWidth = paint.measureText(string);
-//        }
-//    }
 }

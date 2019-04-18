@@ -27,42 +27,21 @@
         android:textStyle="bold" />
 
     <View
+        android:visibility="gone"
         android:id="@+id/view_dash_position"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_alignBottom="@id/top_baseline"
+        android:layout_alignParentEnd="true" />
+
+    <com.st0rmtroop3r.telegramchart.DatesRangeView
+        android:id="@+id/dates_range"
         android:layout_alignParentEnd="true"
-        android:layout_marginEnd="100dp" />
-
-    <TextView
-        android:id="@+id/txv_date_from"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:layout_alignBottom="@id/top_baseline"
-        android:layout_toStartOf="@id/txv_dates_dash"
-        android:text="42 Mac 3456"
-        android:textSize="14sp"
-        android:textStyle="bold" />
-
-    <TextView
-        android:id="@+id/txv_dates_dash"
+        android:layout_marginBottom="-10dp"
+        android:layout_marginEnd="16dp"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignEnd="@id/view_dash_position"
-        android:layout_alignBottom="@id/top_baseline"
-        android:text=" - "
-        android:textSize="14sp"
-        android:textStyle="bold" />
-
-    <TextView
-        android:id="@+id/txv_date_to"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@id/top_baseline"
-        android:layout_toEndOf="@id/txv_dates_dash"
-        android:text="42 Mac 3456"
-        android:textSize="14sp"
-        android:textStyle="bold" />
+        android:layout_height="wrap_content" />
 
     <com.st0rmtroop3r.telegramchart.views.ChartGraphView
         android:id="@+id/reactive"

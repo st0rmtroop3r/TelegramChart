@@ -6,7 +6,6 @@ import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
-import android.util.Log;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -91,7 +90,6 @@ public abstract class ToolTip {
 
     public void setRowSpacing(float spacing) {
         rowSpacing = spacing;
-        Log.w(TAG, "setRowSpacing: " + rowSpacing);
     }
 
     public void setColumnSpacing(float spacing) {
@@ -142,7 +140,6 @@ public abstract class ToolTip {
             texts.add(text);
             if (width < text.textWidth) width = text.textWidth;
             height += (p.getTextSize() + rowSpacing);
-            Log.i(TAG, "addText: " + height + " = p.getTextSize() " + p.getTextSize() + " + rowSpacing " + rowSpacing);
         }
 
         public void clear() {

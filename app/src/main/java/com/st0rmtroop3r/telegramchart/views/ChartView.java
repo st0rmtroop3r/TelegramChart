@@ -17,13 +17,13 @@ import android.widget.TextView;
 
 import com.st0rmtroop3r.telegramchart.ChartFactory;
 import com.st0rmtroop3r.telegramchart.ChartFactoryBuilder;
+import com.st0rmtroop3r.telegramchart.DatesRangeView;
 import com.st0rmtroop3r.telegramchart.R;
 import com.st0rmtroop3r.telegramchart.enitity.ChartData;
 import com.st0rmtroop3r.telegramchart.enitity.ChartYData;
 import com.st0rmtroop3r.telegramchart.views.charts.ChartAnimator;
 import com.st0rmtroop3r.telegramchart.views.charts.YAxis;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -37,9 +37,7 @@ public class ChartView extends FrameLayout {
     private ChartGraphPreview preview;
     ChartData data;
     private TextView txvChartName;
-    private TextView txvDateFrom;
-    private TextView txvDateTo;
-    private TextView txvDateDash;
+    private DatesRangeView datesRange;
     private ChartGraphView reactive;
     private CoordinatesView2 coordinatesView;
     private ToolTipView toolTipView;
@@ -53,7 +51,7 @@ public class ChartView extends FrameLayout {
     private ChartDrawable chartPreview;
     private ChartDrawable chart;
     private RelativeLayout relativeLayout;
-    private final List<String> dates = new ArrayList<>();
+    private final List<Date> dates = new ArrayList<>();
 
     public ChartView(Context context) {
         super(context);
@@ -79,9 +77,7 @@ public class ChartView extends FrameLayout {
         LayoutInflater.from(context).inflate(R.layout.layout_chart, this);
         relativeLayout = findViewById(R.id.rl_chart);
         txvChartName = findViewById(R.id.txv_chart_name);
-        txvDateFrom = findViewById(R.id.txv_date_from);
-        txvDateTo = findViewById(R.id.txv_date_to);
-        txvDateDash = findViewById(R.id.txv_dates_dash);
+        datesRange = findViewById(R.id.dates_range);
         reactive = findViewById(R.id.reactive);
         coordinatesView = findViewById(R.id.coordinates);
         toolTipView = findViewById(R.id.tool_tip);
@@ -110,7 +106,7 @@ public class ChartView extends FrameLayout {
             Log.e(TAG, "setCharData: chartPreview == null" );
             return;
         }
-        formatDates(chartData.xData);
+        createDates(chartData.xData);
         chartPreview.setData(chartData);
         chart.setData(chartData);
 
@@ -139,29 +135,26 @@ public class ChartView extends FrameLayout {
         selector.setSelectionListener((left, right) -> {
             chartAnimator.onSelectedRangeChanged(left, right);
             xAxisMarks.setXAxisDataRange(left, right);
-            txvDateFrom.setText(getDateAt(left));
-            txvDateTo.setText(getDateAt(right));
+            datesRange.changeRange(getDateAt(left), getDateAt(right));
             toolTipView.hideToolTip();
         });
         selector.setInitialSelectionListener((left, right) -> {
             xAxisMarks.setXAxisDataRange(left, right);
             chartAnimator.setInitialDataRange(left, right);
-            txvDateFrom.setText(getDateAt(left));
-            txvDateTo.setText(getDateAt(right));
+            datesRange.setRange(getDateAt(left), getDateAt(right));
         });
         setupButtons(chartData.yDataList);
     }
 
-    private void formatDates(long[] xData) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy");
+    private void createDates(long[] timestamps) {
         dates.clear();
-        for (long timeMs : xData) {
-            dates.add(dateFormat.format(new Date(timeMs)));
+        for (long timeMs : timestamps) {
+            dates.add(new Date(timeMs));
         }
     }
 
-    private String getDateAt(float percent) {
-        if (dates.size() == 0) return "";
+    private Date getDateAt(float percent) {
+        if (dates.size() == 0) return new Date();
         int index = (int) (dates.size() * percent);
         index = (index < 1) ? 1 : (index > dates.size()) ? dates.size() : index;
         return dates.get(index - 1);
@@ -199,9 +192,7 @@ public class ChartView extends FrameLayout {
 
         theme.resolveAttribute(android.R.attr.textColor, value, true);
         txvChartName.setTextColor(value.data);
-        txvDateTo.setTextColor(value.data);
-        txvDateFrom.setTextColor(value.data);
-        txvDateDash.setTextColor(value.data);
+        datesRange.setTextColor(value.data);
 
         theme.resolveAttribute(R.attr.window_selector_dim_color, value, true);
         selector.setSideDimColor(value.data);

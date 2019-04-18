@@ -90,35 +90,4 @@ public class StackedBarChartToolTip extends ToolTip {
             values.texts.get(values.texts.size() - 1).paint.setColor(color);
         }
     }
-//    class Column {
-//
-//        float width = 0;
-//        float height = 0;
-//        List<Text> texts = new LinkedList<>();
-//
-//        void addText(String s, Paint p) {
-//            Text text = new Text(s, p);
-//            texts.add(text);
-//            if (width < text.textWidth) width = text.textWidth;
-//            height += (p.getTextSize() + rowSpacing);
-//        }
-//
-//        void clear() {
-//            texts.clear();
-//            width = 0;
-//            height = 0;
-//        }
-//    }
-//
-//    class Text {
-//        String string;
-//        Paint paint;
-//        float textWidth;
-//
-//        Text(String s, Paint p) {
-//            string = s;
-//            paint = p;
-//            textWidth = paint.measureText(string);
-//        }
-//    }
 }

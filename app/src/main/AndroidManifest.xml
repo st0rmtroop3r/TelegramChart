@@ -9,6 +9,17 @@
         android:roundIcon="@drawable/ic_launcher"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
+        <activity android:name=".ActivityStage2" android:label="Recycler">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+        </activity>
+
         <activity android:name=".MainActivity" android:label="@string/statistics">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -25,15 +36,6 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".ActivityStage2" android:label="Recycler">
-
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-
-        </activity>
     </application>
 
 </manifest>
